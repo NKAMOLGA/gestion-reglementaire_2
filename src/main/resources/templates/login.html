@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Connexion')}"></head>
+<body class="login-body">
+	<button type="button" class="theme-toggle login-theme-toggle" title="Changer de thème" aria-label="Changer de thème">
+		<i class="bi bi-moon-fill"></i>
+	</button>
+
+	<div class="login-page">
+		<div class="login-card">
+			<div class="login-card__header">
+				<img class="login-card__logo"
+					 th:src="@{/images/bc-pme-logo.png}"
+					 alt="BC-PME — Banque Camerounaise des Petites et Moyennes Entreprises">
+				<h1 class="login-card__title">Gestion Réglementaire</h1>
+				<p class="login-card__subtitle">Connectez-vous à votre espace</p>
+			</div>
+
+			<div class="login-card__body">
+				<div class="login-alert login-alert--error" th:if="${errorMessage}">
+					<i class="bi bi-exclamation-circle"></i>
+					<span th:text="${errorMessage}"></span>
+				</div>
+				<div class="login-alert login-alert--success" th:if="${param.logout}">
+					<i class="bi bi-check-circle"></i>
+					<span>Déconnexion réussie.</span>
+				</div>
+
+				<form class="login-form" th:action="@{/login}" method="post">
+					<div class="login-form__group">
+						<label class="login-form__label" for="username">
+							<i class="bi bi-person"></i> Nom d'utilisateur
+						</label>
+						<input class="login-form__input" type="text" id="username" name="username"
+							   placeholder="Votre identifiant" required autofocus>
+					</div>
+					<div class="login-form__group">
+						<label class="login-form__label" for="password">
+							<i class="bi bi-lock"></i> Mot de passe
+						</label>
+						<input class="login-form__input" type="password" id="password" name="password"
+							   placeholder="Votre mot de passe" required>
+					</div>
+					<button class="login-form__submit" type="submit">
+						<i class="bi bi-box-arrow-in-right"></i> Se connecter
+					</button>
+				</form>
+			</div>
+
+			<div class="login-card__footer">
+				<p>BC-PME SA — Banque Camerounaise des Petites et Moyennes Entreprises</p>
+			</div>
+		</div>
+	</div>
+	<script th:src="@{/js/security.js}"></script>
+</body>
+</html>

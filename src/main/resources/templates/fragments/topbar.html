@@ -1,0 +1,31 @@
+<header th:fragment="topbar"
+		class="app-topbar"
+		xmlns:th="http://www.thymeleaf.org"
+		xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+	<div class="app-topbar__left">
+		<h1 class="app-topbar__title" th:text="${pageTitle}">Titre</h1>
+		<p class="app-topbar__subtitle" th:if="${pageSubtitle}" th:text="${pageSubtitle}"></p>
+	</div>
+
+	<div class="app-topbar__right">
+		<button type="button" class="theme-toggle" title="Changer de thème" aria-label="Changer de thème">
+			<i class="bi bi-moon-fill"></i>
+		</button>
+
+		<div class="app-topbar__date">
+			<i class="bi bi-calendar3"></i>
+			<span id="topbar-date"></span>
+		</div>
+
+		<div class="app-topbar__user">
+			<div class="app-topbar__avatar">
+				<i class="bi bi-person-fill"></i>
+			</div>
+			<div class="app-topbar__user-info">
+				<span class="app-topbar__user-name" sec:authentication="name">Utilisateur</span>
+				<span class="app-topbar__user-role">BC-PME</span>
+			</div>
+		</div>
+	</div>
+</header>

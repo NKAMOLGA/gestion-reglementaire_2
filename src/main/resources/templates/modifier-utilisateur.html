@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Modifier utilisateur')}"></head>
+<body class="app-body" th:with="pageTitle='Modifier utilisateur', pageSubtitle='Mettre à jour le compte'">
+<div class="app-shell">
+	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+	<main class="app-main">
+		<header th:replace="~{fragments/topbar :: topbar}"></header>
+		<div class="page-content">
+			<div class="app-card" style="max-width: 560px;">
+				<div class="app-card__body">
+					<form th:action="@{/utilisateurs/save}" method="post" th:object="${utilisateur}">
+						<input type="hidden" th:field="*{id}">
+						<div class="mb-3">
+							<label class="form-label"><i class="bi bi-person me-1"></i> Nom d'utilisateur</label>
+							<input type="text" class="form-control" th:field="*{username}" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label"><i class="bi bi-key me-1"></i> Mot de passe</label>
+							<input type="password" class="form-control" th:field="*{password}">
+						</div>
+						<div class="mb-3">
+							<label class="form-label"><i class="bi bi-shield me-1"></i> Rôle</label>
+							<select class="form-select" th:field="*{role}">
+								<option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.name}"></option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label"><i class="bi bi-toggle-on me-1"></i> Statut</label>
+							<select class="form-select" th:field="*{actif}">
+								<option value="true">Actif</option>
+								<option value="false">Bloqué</option>
+							</select>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Enregistrer</button>
+							<a th:href="@{/utilisateurs}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Annuler</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</main>
+</div>
+</body>
+</html>

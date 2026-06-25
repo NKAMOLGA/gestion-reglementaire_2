@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Tableau de bord')}"></head>
+<body class="app-body" th:with="pageTitle=|Tableau de bord|,pageSubtitle=|Vue d'ensemble de l'activité COL|">
+<div class="app-shell">
+	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+	<main class="app-main">
+		<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+		<div class="page-content">
+
+			<div class="welcome-banner">
+				<div>
+					<h2 class="welcome-banner__title">
+						Bonjour, <span sec:authentication="name">Utilisateur</span>
+					</h2>
+					<p class="welcome-banner__text">Bienvenue sur votre espace de gestion réglementaire BC-PME.</p>
+				</div>
+				<div class="welcome-banner__icon">
+					<i class="bi bi-bank2"></i>
+				</div>
+			</div>
+
+			<div class="kpi-grid">
+				<div class="kpi-card">
+					<div class="kpi-card__icon kpi-card__icon--primary"><i class="bi bi-files"></i></div>
+					<div>
+						<div class="kpi-card__label">Total fichiers</div>
+						<div class="kpi-card__value" th:text="${total}">0</div>
+					</div>
+				</div>
+				<div class="kpi-card">
+					<div class="kpi-card__icon kpi-card__icon--success"><i class="bi bi-check-circle"></i></div>
+					<div>
+						<div class="kpi-card__label">Succès</div>
+						<div class="kpi-card__value" th:text="${success}">0</div>
+					</div>
+				</div>
+				<div class="kpi-card">
+					<div class="kpi-card__icon kpi-card__icon--danger"><i class="bi bi-x-circle"></i></div>
+					<div>
+						<div class="kpi-card__label">Erreurs</div>
+						<div class="kpi-card__value" th:text="${error}">0</div>
+					</div>
+				</div>
+				<div class="kpi-card">
+					<div class="kpi-card__icon kpi-card__icon--info"><i class="bi bi-people"></i></div>
+					<div>
+						<div class="kpi-card__label">Utilisateurs actifs</div>
+						<div class="kpi-card__value" th:text="${users}">0</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="app-card">
+				<div class="app-card__header">
+					<h2 class="app-card__header-title">
+						<i class="bi bi-activity"></i> Activité récente
+					</h2>
+				</div>
+				<div class="app-card__body app-card__body--flush">
+					<div class="app-table-wrap">
+						<table class="app-table">
+							<thead>
+							<tr>
+								<th>Date</th>
+								<th>Utilisateur</th>
+								<th>Fichier</th>
+								<th>Statut</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr th:each="h : ${latest}">
+								<td th:text="${h.dateGeneration}"></td>
+								<td th:text="${h.utilisateur}"></td>
+								<td th:text="${h.nomFichier}"></td>
+								<td>
+									<span class="badge-status badge-status--success" th:if="${h.statut == 'SUCCESS'}">
+										<i class="bi bi-check-lg"></i> Succès
+									</span>
+									<span class="badge-status badge-status--danger" th:if="${h.statut == 'ERROR'}">
+										<i class="bi bi-x-lg"></i> Erreur
+									</span>
+									<span class="badge-status badge-status--neutral"
+										  th:if="${h.statut != 'SUCCESS' and h.statut != 'ERROR'}"
+										  th:text="${h.statut}"></span>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</main>
+</div>
+</body>
+</html>

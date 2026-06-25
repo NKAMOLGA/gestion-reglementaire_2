@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Résultat comparaison')}"></head>
+<body class="app-body" th:with="pageTitle=|Résultat de comparaison|,pageSubtitle=|Différences entre deux fichiers COL|">
+<div class="app-shell">
+	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+	<main class="app-main">
+		<header th:replace="~{fragments/topbar :: topbar}"></header>
+		<div class="page-content" th:object="${result}">
+
+			<div class="kpi-grid">
+				<div class="kpi-card">
+					<div class="kpi-card__icon kpi-card__icon--success"><i class="bi bi-plus-circle"></i></div>
+					<div>
+						<div class="kpi-card__label">Ajoutés</div>
+						<div class="kpi-card__value" th:text="*{addedCount}">0</div>
+					</div>
+				</div>
+				<div class="kpi-card">
+					<div class="kpi-card__icon kpi-card__icon--danger"><i class="bi bi-dash-circle"></i></div>
+					<div>
+						<div class="kpi-card__label">Supprimés</div>
+						<div class="kpi-card__value" th:text="*{removedCount}">0</div>
+					</div>
+				</div>
+				<div class="kpi-card">
+					<div class="kpi-card__icon kpi-card__icon--primary"><i class="bi bi-currency-exchange"></i></div>
+					<div>
+						<div class="kpi-card__label">Delta total montants</div>
+						<div class="kpi-card__value" th:text="*{totalDelta}">0</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="app-card mb-4">
+				<div class="app-card__header">
+					<h2 class="app-card__header-title"><i class="bi bi-files"></i> Fichiers comparés</h2>
+				</div>
+				<div class="app-card__body">
+					<div class="row g-3">
+						<div class="col-md-6">
+							<strong>Fichier A (référence)</strong>
+							<p class="mb-1">
+								<a th:href="@{'/downloads/view'(filename=*{fileA.filename})}" th:text="*{fileA.filename}"></a>
+							</p>
+							<small class="text-muted">
+								<span th:text="*{fileA.accountCount}"></span> comptes
+								<span th:if="*{fileA.fileDate != null}"> — <span th:text="*{fileA.fileDate}"></span></span>
+							</small>
+						</div>
+						<div class="col-md-6">
+							<strong>Fichier B (comparé)</strong>
+							<p class="mb-1">
+								<a th:href="@{'/downloads/view'(filename=*{fileB.filename})}" th:text="*{fileB.filename}"></a>
+							</p>
+							<small class="text-muted">
+								<span th:text="*{fileB.accountCount}"></span> comptes
+								<span th:if="*{fileB.fileDate != null}"> — <span th:text="*{fileB.fileDate}"></span></span>
+							</small>
+						</div>
+					</div>
+					<div class="mt-3 text-muted" th:if="${history != null}">
+						<small>
+							Enregistré le <span th:text="${#temporals.format(history.dateComparaison, 'dd/MM/yyyy HH:mm')}"></span>
+							par <span th:text="${history.utilisateur}"></span>
+						</small>
+					</div>
+				</div>
+			</div>
+
+			<div class="app-card">
+				<div class="app-card__header">
+					<h2 class="app-card__header-title"><i class="bi bi-list-ul"></i> Détail des différences</h2>
+				</div>
+				<div class="app-card__body app-card__body--flush">
+					<div class="app-table-wrap">
+						<table class="app-table">
+							<thead>
+							<tr>
+								<th>Code</th>
+								<th>Libellé A</th>
+								<th>Montant A</th>
+								<th>Libellé B</th>
+								<th>Montant B</th>
+								<th>Delta</th>
+								<th>Type</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr th:each="d : *{significantDiffs()}">
+								<td th:text="${d.code}"></td>
+								<td th:text="${d.libelleA} ?: '—'"></td>
+								<td th:text="${d.montantA} ?: '—'"></td>
+								<td th:text="${d.libelleB} ?: '—'"></td>
+								<td th:text="${d.montantB} ?: '—'"></td>
+								<td>
+									<span th:classappend="${d.delta != null and d.delta.signum() > 0} ? 'text-success' : (${d.delta != null and d.delta.signum() < 0} ? 'text-danger' : '')"
+										  th:text="${d.delta}"></span>
+								</td>
+								<td>
+									<span th:if="${d.changeType.name() == 'ADDED'}" class="badge-status badge-status--success">Ajouté</span>
+									<span th:if="${d.changeType.name() == 'REMOVED'}" class="badge-status badge-status--danger">Supprimé</span>
+									<span th:if="${d.changeType.name() == 'MODIFIED'}" class="badge-status badge-status--info">Modifié</span>
+								</td>
+							</tr>
+							<tr th:if="${#lists.isEmpty(result.significantDiffs())}">
+								<td colspan="7">
+									<div class="empty-state">
+										<i class="bi bi-check-circle"></i>
+										<p>Aucune différence significative entre les deux fichiers</p>
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="mt-3 d-flex gap-2 flex-wrap">
+				<a th:if="${source == 'PLANIFICATEUR' and scheduleId != null}"
+				   th:href="@{'/comparaison/planificateur/' + ${scheduleId}}"
+				   class="btn btn-outline-secondary">
+					<i class="bi bi-arrow-left"></i> Retour planificateur
+				</a>
+				<a th:if="${source == 'MANUELLE'}" th:href="@{/comparaison/manuelle}" class="btn btn-outline-secondary">
+					<i class="bi bi-arrow-left"></i> Nouvelle comparaison
+				</a>
+				<a th:if="${source == 'SUIVI' and suiviId != null}"
+				   th:href="@{'/comparaison/suivi/' + ${suiviId}}"
+				   class="btn btn-outline-secondary">
+					<i class="bi bi-graph-up"></i> Retour au suivi
+				</a>
+				<a th:href="@{/comparaison/historique}" class="btn btn-outline-secondary">
+					<i class="bi bi-clock-history"></i> Historique
+				</a>
+				<a th:href="@{/comparaison}" class="btn btn-outline-secondary">
+					<i class="bi bi-house"></i> Accueil analyse
+				</a>
+			</div>
+
+		</div>
+	</main>
+</div>
+</body>
+</html>

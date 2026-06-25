@@ -1,0 +1,20 @@
+<div th:fragment="deleteModal" xmlns:th="http://www.thymeleaf.org">
+	<div id="deleteConfirmOverlay" class="confirm-overlay" hidden>
+		<div class="confirm-dialog" role="dialog" aria-labelledby="deleteConfirmTitle" aria-modal="true">
+			<div class="confirm-dialog__icon">
+				<i class="bi bi-exclamation-triangle"></i>
+			</div>
+			<h3 id="deleteConfirmTitle" class="confirm-dialog__title">Confirmer la suppression</h3>
+			<p id="deleteConfirmMessage" class="confirm-dialog__text">Voulez-vous vraiment supprimer cet élément ?</p>
+			<div class="confirm-dialog__actions">
+				<button type="button" class="btn btn-outline-secondary" id="deleteConfirmCancel">
+					<i class="bi bi-x-lg"></i> Annuler
+				</button>
+				<a id="deleteConfirmLink" class="btn btn-danger" href="#">
+					<i class="bi bi-trash"></i> Supprimer
+				</a>
+			</div>
+		</div>
+	</div>
+	<script th:src="@{/js/confirm-delete.js}"></script>
+</div>

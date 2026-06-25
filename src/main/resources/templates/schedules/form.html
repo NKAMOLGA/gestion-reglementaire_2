@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Planification COL')}"></head>
+<body class="app-body" th:with="pageTitle='Planification COL', pageSubtitle='Configurer une exécution automatique'">
+<div class="app-shell">
+	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+	<main class="app-main">
+		<header th:replace="~{fragments/topbar :: topbar}"></header>
+		<div class="page-content">
+			<div class="app-card" style="max-width: 600px;">
+				<div class="app-card__body">
+					<form th:action="@{/schedules/save}" th:object="${schedule}" method="post">
+						<input type="hidden" th:field="*{id}">
+						<div class="mb-3">
+							<label class="form-label"><i class="bi bi-tag me-1"></i> Nom</label>
+							<input class="form-control" th:field="*{nom}" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label"><i class="bi bi-arrow-repeat me-1"></i> Fréquence (jours)</label>
+							<input type="number" class="form-control" th:field="*{frequenceJours}" min="1" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label"><i class="bi bi-calendar-event me-1"></i> Date début</label>
+							<input type="datetime-local" class="form-control" th:field="*{dateDebut}">
+						</div>
+						<div class="mb-3">
+							<label class="form-label"><i class="bi bi-calendar-x me-1"></i> Date fin</label>
+							<input type="datetime-local" class="form-control" th:field="*{dateFin}">
+						</div>
+						<div class="mb-3">
+							<label class="form-label"><i class="bi bi-clock me-1"></i> Heure d'exécution</label>
+							<input type="time" class="form-control" th:field="*{heureExecution}">
+						</div>
+						<div class="form-check mb-3">
+							<input type="checkbox" class="form-check-input" th:field="*{active}" id="activeCheck">
+							<label class="form-check-label" for="activeCheck">Planification active</label>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Enregistrer</button>
+							<a th:href="@{/schedules}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Retour</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</main>
+</div>
+</body>
+</html>

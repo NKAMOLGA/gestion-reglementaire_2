@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Analyse comparative')}"></head>
+<body class="app-body" th:with="pageTitle=|Analyse comparative|,pageSubtitle=|Comparer les fichiers COL et suivre les évolutions|">
+<div class="app-shell">
+	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+	<main class="app-main">
+		<header th:replace="~{fragments/topbar :: topbar}"></header>
+		<div class="page-content">
+
+			<div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+				<a th:href="@{/comparaison/historique}" class="kpi-card" style="text-decoration:none;color:inherit;">
+					<div class="kpi-card__icon kpi-card__icon--primary"><i class="bi bi-clock-history"></i></div>
+					<div>
+						<div class="kpi-card__label">Historique</div>
+						<div class="kpi-card__value" style="font-size:1.1rem;">Comparaisons passées</div>
+						<p class="text-muted mb-0 mt-1" style="font-size:0.85rem;">
+							Consulter et rouvrir les rendus de comparaison enregistrés.
+						</p>
+					</div>
+				</a>
+
+				<a th:href="@{/comparaison/planificateur}" class="kpi-card" style="text-decoration:none;color:inherit;">
+					<div class="kpi-card__icon kpi-card__icon--primary"><i class="bi bi-calendar-check"></i></div>
+					<div>
+						<div class="kpi-card__label">Cas 1 — Planificateur</div>
+						<div class="kpi-card__value" style="font-size:1.1rem;">Étude comparative</div>
+						<p class="text-muted mb-0 mt-1" style="font-size:0.85rem;">
+							Comparer les fichiers générés par une planification COL.
+						</p>
+					</div>
+				</a>
+
+				<a th:href="@{/comparaison/manuelle}" class="kpi-card" style="text-decoration:none;color:inherit;">
+					<div class="kpi-card__icon kpi-card__icon--info"><i class="bi bi-files"></i></div>
+					<div>
+						<div class="kpi-card__label">Cas 2 — Manuelle</div>
+						<div class="kpi-card__value" style="font-size:1.1rem;">Deux fichiers</div>
+						<p class="text-muted mb-0 mt-1" style="font-size:0.85rem;">
+							Choisir deux fichiers COL et générer une comparaison détaillée.
+						</p>
+					</div>
+				</a>
+
+				<a th:href="@{/comparaison/suivi}" class="kpi-card" style="text-decoration:none;color:inherit;">
+					<div class="kpi-card__icon kpi-card__icon--success"><i class="bi bi-graph-up-arrow"></i></div>
+					<div>
+						<div class="kpi-card__label">Cas 3 — Suivi périodique</div>
+						<div class="kpi-card__value" style="font-size:1.1rem;">Tendances</div>
+						<p class="text-muted mb-0 mt-1" style="font-size:0.85rem;">
+							Définir une fréquence et visualiser l'évolution des comptes.
+						</p>
+					</div>
+				</a>
+			</div>
+
+		</div>
+	</main>
+</div>
+</body>
+</html>

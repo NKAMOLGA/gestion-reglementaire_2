@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Utilisateurs')}"></head>
+<body class="app-body" th:with="pageTitle='Utilisateurs', pageSubtitle='Administration des comptes et rôles'">
+<div class="app-shell">
+	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+	<main class="app-main">
+		<header th:replace="~{fragments/topbar :: topbar}"></header>
+		<div class="page-content">
+			<div class="page-toolbar">
+				<a th:href="@{/utilisateurs/nouveau}" class="btn btn-primary">
+					<i class="bi bi-person-plus"></i> Ajouter un utilisateur
+				</a>
+			</div>
+			<div class="app-card">
+				<div class="app-card__body app-card__body--flush">
+					<div class="app-table-wrap">
+						<table class="app-table">
+							<thead>
+							<tr><th>Utilisateur</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr>
+							</thead>
+							<tbody>
+							<tr th:each="u : ${utilisateurs}">
+								<td><i class="bi bi-person-circle text-muted me-1"></i><span th:text="${u.username}"></span></td>
+								<td><span class="badge-status badge-status--neutral" th:text="${u.role.name}"></span></td>
+								<td>
+									<a th:if="${u.actif}" th:href="@{/utilisateurs/bloquer/{id}(id=${u.id})}" class="badge-status badge-status--active text-decoration-none">
+										<i class="bi bi-check-circle"></i> Actif
+									</a>
+									<a th:if="${!u.actif}" th:href="@{/utilisateurs/debloquer/{id}(id=${u.id})}" class="badge-status badge-status--blocked text-decoration-none">
+										<i class="bi bi-lock"></i> Bloqué
+									</a>
+								</td>
+								<td>
+									<div class="actions">
+										<a class="btn btn-outline-primary btn-sm btn-icon" th:href="@{/utilisateurs/view/{id}(id=${u.id})}" title="Voir"><i class="bi bi-eye"></i></a>
+										<a class="btn btn-outline-secondary btn-sm btn-icon" th:href="@{/utilisateurs/edit/{id}(id=${u.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+										<a class="btn btn-outline-danger btn-sm btn-icon" th:href="@{/utilisateurs/delete/{id}(id=${u.id})}" title="Supprimer" onclick="return confirm('Supprimer cet utilisateur ?')"><i class="bi bi-trash"></i></a>
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+</div>
+</body>
+</html>

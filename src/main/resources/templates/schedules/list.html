@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Planification COL')}"></head>
+
+<body class="app-body" th:with="pageTitle='Planifications COL', pageSubtitle='Exécutions automatiques'">
+
+<div class="app-shell">
+	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+	<main class="app-main">
+		<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+		<div class="page-content">
+
+			<div class="page-toolbar">
+				<a th:href="@{/schedules/new}" class="btn btn-primary">
+					<i class="bi bi-plus-lg"></i> Nouvelle planification
+				</a>
+			</div>
+
+			<div class="app-card">
+				<div class="app-card__body app-card__body--flush">
+
+					<div class="app-table-wrap">
+						<table class="app-table">
+
+							<thead>
+							<tr>
+								<th>Nom</th>
+								<th>Fréquence</th>
+								<th>Début</th>
+								<th>Heure</th>
+
+								<th>Statut</th>
+								<th>Actions</th>
+							</tr>
+							</thead>
+
+							<tbody>
+							<tr th:each="s : ${schedules}">
+
+								<td th:text="${s.nom}"></td>
+
+								<td th:text="${s.frequenceJours} + ' jours'"></td>
+
+								<td th:text="${s.dateDebut}"></td>
+
+								<td th:text="${s.heureExecution}"></td>
+
+
+								<td>
+									<span th:if="${s.active}" class="badge-status badge-status--active">
+										<i class="bi bi-check-circle"></i> Actif
+									</span>
+									<span th:if="${!s.active}" class="badge-status badge-status--blocked">
+										<i class="bi bi-pause-circle"></i> Inactif
+									</span>
+								</td>
+
+								<td>
+									<div class="actions">
+
+										<a th:href="@{'/schedules/view/' + ${s.id}}"
+										   class="btn btn-outline-primary btn-sm btn-icon"
+										   title="Voir">
+											<i class="bi bi-eye"></i>
+										</a>
+
+										<a th:href="@{'/schedules/edit/' + ${s.id}}"
+										   class="btn btn-outline-secondary btn-sm btn-icon"
+										   title="Modifier">
+											<i class="bi bi-pencil"></i>
+										</a>
+
+										<a th:href="@{'/schedules/toggle/' + ${s.id}}"
+										   class="btn btn-outline-warning btn-sm btn-icon"
+										   title="Activer/Désactiver">
+											<i class="bi bi-arrow-repeat"></i>
+										</a>
+
+										<button type="button"
+												class="btn btn-outline-danger btn-sm btn-icon"
+												title="Supprimer"
+												th:attr="data-delete-url=@{/schedules/delete/{id}(id=${s.id})},
+														data-delete-message=|Supprimer la planification « ${s.nom} » ?|">
+											<i class="bi bi-trash"></i>
+										</button>
+
+									</div>
+								</td>
+
+							</tr>
+							</tbody>
+
+						</table>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</main>
+</div>
+
+<div th:replace="~{fragments/confirm-delete :: deleteModal}"></div>
+
+</body>
+</html>
