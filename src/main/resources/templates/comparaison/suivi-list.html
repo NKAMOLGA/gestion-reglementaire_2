@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/head :: head('Suivi périodique')}"></head>
-<body class="app-body" th:with="pageTitle=|Suivi périodique|,pageSubtitle=|Comparaisons automatiques sur une fréquence définie|">
+<head th:replace="~{fragments/head :: head('Tendances COL')}"></head>
+<body class="app-body" th:with="pageTitle=|Tendances|,pageSubtitle=|Choisir un planificateur pour visualiser l'évolution|">
 <div class="app-shell">
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 	<main class="app-main">
 		<header th:replace="~{fragments/topbar :: topbar}"></header>
 		<div class="page-content">
 
-			<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-				<a th:href="@{/comparaison/suivi/new}" class="btn btn-primary">
-					<i class="bi bi-plus-lg"></i> Nouveau suivi
-				</a>
+			<div class="d-flex justify-content-end mb-3">
 				<a th:href="@{/comparaison}" class="btn btn-outline-secondary">
 					<i class="bi bi-arrow-left"></i> Retour
 				</a>
@@ -20,7 +17,7 @@
 
 			<div class="app-card">
 				<div class="app-card__header">
-					<h2 class="app-card__header-title"><i class="bi bi-graph-up"></i> Suivis configurés</h2>
+					<h2 class="app-card__header-title"><i class="bi bi-graph-up"></i> Planificateurs COL</h2>
 				</div>
 				<div class="app-card__body app-card__body--flush">
 					<div class="app-table-wrap">
@@ -31,21 +28,21 @@
 								<th>Fréquence</th>
 								<th>Période</th>
 								<th>Statut</th>
-								<th>Actions</th>
+								<th>Action</th>
 							</tr>
 							</thead>
 							<tbody>
 							<tr th:if="${#lists.isEmpty(schedules)}">
 								<td colspan="5">
 									<div class="empty-state">
-										<i class="bi bi-graph-up-arrow"></i>
-										<p>Aucun suivi périodique configuré</p>
+										<i class="bi bi-calendar-x"></i>
+										<p>Aucun planificateur COL configuré</p>
 									</div>
 								</td>
 							</tr>
 							<tr th:each="s : ${schedules}">
 								<td th:text="${s.nom}"></td>
-								<td th:text="|Tous les ${s.frequenceJours} jours|"></td>
+								<td th:text="${s.frequenceJours} + ' jours'"></td>
 								<td>
 									<span th:text="${s.dateDebut}"></span> → <span th:text="${s.dateFin}"></span>
 								</td>
@@ -53,18 +50,10 @@
 									<span th:if="${s.active}" class="badge-status badge-status--success">Actif</span>
 									<span th:unless="${s.active}" class="badge-status badge-status--neutral">Inactif</span>
 								</td>
-								<td class="text-nowrap">
+								<td>
 									<a th:href="@{'/comparaison/suivi/' + ${s.id}}" class="btn btn-primary btn-sm">
-										<i class="bi bi-bar-chart"></i> Tableau de bord
+										<i class="bi bi-graph-up-arrow"></i> Voir tendances
 									</a>
-									<a th:href="@{'/comparaison/suivi/edit/' + ${s.id}}" class="btn btn-outline-secondary btn-sm">
-										<i class="bi bi-pencil"></i>
-									</a>
-									<button type="button"
-											class="btn btn-outline-danger btn-sm"
-											th:attr="data-delete-url=@{/comparaison/suivi/delete/{id}(id=${s.id})}, data-delete-message=|Supprimer le suivi « ${s.nom} » ?|">
-										<i class="bi bi-trash"></i>
-									</button>
 								</td>
 							</tr>
 							</tbody>
@@ -76,6 +65,5 @@
 		</div>
 	</main>
 </div>
-<div th:replace="~{fragments/confirm-delete :: deleteModal}"></div>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: head('Tableau de bord suivi')}"></head>
-<body class="app-body" th:with="pageTitle=${schedule.nom},pageSubtitle=|Évolution des comptes COL|">
+<body class="app-body" th:with="pageTitle=${schedule.nom},pageSubtitle=|Tendances — fichiers générés par ce planificateur|">
 <div class="app-shell">
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 	<main class="app-main">
@@ -10,11 +10,11 @@
 		<div class="page-content">
 
 			<div class="d-flex gap-2 mb-3 flex-wrap">
-				<a th:href="@{'/comparaison/historique'(suiviId=${schedule.id})}" class="btn btn-outline-primary">
-					<i class="bi bi-clock-history"></i> Historique du suivi
+				<a th:href="@{'/comparaison/historique'(planificateurId=${schedule.id})}" class="btn btn-outline-primary">
+					<i class="bi bi-clock-history"></i> Historique des tendances
 				</a>
 				<a th:href="@{/comparaison/suivi}" class="btn btn-outline-secondary">
-					<i class="bi bi-arrow-left"></i> Retour aux suivis
+					<i class="bi bi-arrow-left"></i> Retour aux planificateurs
 				</a>
 			</div>
 
@@ -33,16 +33,16 @@
 							<label class="form-label">Fichier A (référence)</label>
 							<select class="form-select" name="fichierA" required>
 								<option value="">— Choisir —</option>
-								<option th:each="f : ${fichiers}" th:value="${f.name}" th:text="${f.name}"
-										th:selected="${f.name == graphFichierA}"></option>
+								<option th:each="f : ${fichiers}" th:value="${f.nomFichier}" th:text="${f.nomFichier}"
+										th:selected="${f.nomFichier == graphFichierA}"></option>
 							</select>
 						</div>
 						<div class="col-md-5">
 							<label class="form-label">Fichier B (comparé)</label>
 							<select class="form-select" name="fichierB" required>
 								<option value="">— Choisir —</option>
-								<option th:each="f : ${fichiers}" th:value="${f.name}" th:text="${f.name}"
-										th:selected="${f.name == graphFichierB}"></option>
+								<option th:each="f : ${fichiers}" th:value="${f.nomFichier}" th:text="${f.nomFichier}"
+										th:selected="${f.nomFichier == graphFichierB}"></option>
 							</select>
 						</div>
 						<div class="col-md-2">
@@ -73,7 +73,7 @@
 				<div class="app-card__body">
 					<div th:if="${#lists.isEmpty(trends)}" class="empty-state">
 						<i class="bi bi-bar-chart"></i>
-						<p>Pas assez de données pour afficher le graphique (minimum 2 fichiers dans la période)</p>
+						<p>Pas assez de données pour afficher le graphique (minimum 2 fichiers générés par ce planificateur)</p>
 					</div>
 					<canvas id="trendChart" height="100" th:unless="${#lists.isEmpty(trends)}"></canvas>
 				</div>
@@ -206,12 +206,15 @@
 								</tr>
 								</thead>
 								<tbody>
-								<tr th:each="d : *{significantDiffs()}">
+								<tr th:each="d : *{diffs}">
 									<td th:text="${d.code}"></td>
 									<td th:text="${d.montantA} ?: '—'"></td>
 									<td th:text="${d.montantB} ?: '—'"></td>
-									<td th:text="${d.delta}"></td>
+									<td th:text="${d.delta} ?: '0'"></td>
 									<td>
+										<span th:if="${d.changeType.name() == 'UNCHANGED'}" class="text-muted">
+											<i class="bi bi-dash"></i> Stable
+										</span>
 										<span th:if="${d.delta != null and d.delta.signum() > 0}" class="text-success">
 											<i class="bi bi-arrow-up"></i> Hausse
 										</span>

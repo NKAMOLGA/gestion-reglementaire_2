@@ -6,8 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import com.bcpme.gestion_reglementaire.service.MailService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
@@ -20,14 +19,14 @@ import java.io.IOException;
 public class CustomAuthFailureHandler implements AuthenticationFailureHandler {
 
     private final UtilisateurRepository utilisateurRepository;
-    private final JavaMailSender mailSender;
+    private final MailService mailService;
 
     public CustomAuthFailureHandler(
             UtilisateurRepository utilisateurRepository,
-            JavaMailSender mailSender) {
+            MailService mailService) {
 
         this.utilisateurRepository = utilisateurRepository;
-        this.mailSender = mailSender;
+        this.mailService = mailService;
     }
 
     @Override
@@ -59,22 +58,7 @@ public class CustomAuthFailureHandler implements AuthenticationFailureHandler {
                 utilisateurRepository.save(utilisateur);
 
                 try {
-
-                    SimpleMailMessage mail =
-                            new SimpleMailMessage();
-
-                    mail.setTo("nkamolga@gmail.com");
-                    mail.setSubject("Compte utilisateur bloqué");
-
-                    mail.setText(
-                            "Le compte utilisateur '"
-                                    + utilisateur.getUsername()
-                                    + "' a été bloqué après 3 tentatives de connexion échouées.\n\n"
-                                    + "Veuillez vérifier et débloquer le compte si nécessaire."
-                    );
-
-                    mailSender.send(mail);
-
+                    mailService.envoyerAlerte(utilisateur.getUsername());
                 } catch (Exception e) {
 
                     System.out.println(

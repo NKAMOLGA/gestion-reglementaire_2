@@ -77,7 +77,7 @@ public class GenerationScheduleJob {
 
                     System.out.println("RATTRAPAGE : " + schedule.getNom());
 
-                    generationColService.lancerGeneration("PLANIFICATEUR");
+                    generationColService.lancerGeneration("PLANIFICATEUR", schedule.getId());
 
                     schedule.setDerniereExecution(execution);
 
@@ -143,7 +143,7 @@ public class GenerationScheduleJob {
 
                     System.out.println("EXÉCUTION : " + schedule.getNom());
 
-                    generationColService.lancerGeneration("PLANIFICATEUR");
+                    generationColService.lancerGeneration("PLANIFICATEUR", schedule.getId());
 
                     schedule.setDerniereExecution(now);
 

@@ -38,6 +38,10 @@ public class GenerationColService {
     }
 
     public void lancerGeneration(String utilisateur) {
+        lancerGeneration(utilisateur, null);
+    }
+
+    public void lancerGeneration(String utilisateur, Long generationScheduleId) {
 
         GenerationColHistory history = new GenerationColHistory();
 
@@ -158,6 +162,7 @@ public class GenerationColService {
             );
             history.setDateGeneration(generationTime);
             history.setUtilisateur(utilisateur);
+            history.setGenerationScheduleId(generationScheduleId);
             history.setStatut("SUCCESS");
             history.setMessage(
                     "Génération réussie - date métier : "
@@ -170,6 +175,7 @@ public class GenerationColService {
 
             history.setDateGeneration(generationTime);
             history.setUtilisateur(utilisateur);
+            history.setGenerationScheduleId(generationScheduleId);
             history.setStatut("ERROR");
             history.setMessage(
                     e.getClass().getSimpleName()

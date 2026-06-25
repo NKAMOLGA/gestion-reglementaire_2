@@ -24,6 +24,9 @@ public class GenerationColHistory {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Column(name = "generation_schedule_id")
+    private Long generationScheduleId;
+
     // getters & setters
 
     public Long getId() { return id; }
@@ -45,4 +48,7 @@ public class GenerationColHistory {
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
+
+    public Long getGenerationScheduleId() { return generationScheduleId; }
+    public void setGenerationScheduleId(Long generationScheduleId) { this.generationScheduleId = generationScheduleId; }
 }

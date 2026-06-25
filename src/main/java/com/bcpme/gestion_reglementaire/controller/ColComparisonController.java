@@ -4,10 +4,8 @@ import com.bcpme.gestion_reglementaire.comparison.ColComparisonResult;
 import com.bcpme.gestion_reglementaire.comparison.ComparisonTrendPoint;
 import com.bcpme.gestion_reglementaire.comparison.FileComparisonChartPoint;
 import com.bcpme.gestion_reglementaire.entity.ColComparisonHistory;
-import com.bcpme.gestion_reglementaire.entity.ComparisonSchedule;
 import com.bcpme.gestion_reglementaire.entity.GenerationColHistory;
 import com.bcpme.gestion_reglementaire.entity.GenerationSchedule;
-import com.bcpme.gestion_reglementaire.repository.ComparisonScheduleRepository;
 import com.bcpme.gestion_reglementaire.repository.GenerationScheduleRepository;
 import com.bcpme.gestion_reglementaire.service.ArchiveService;
 import com.bcpme.gestion_reglementaire.service.ColComparisonHistoryService;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -31,18 +28,15 @@ public class ColComparisonController {
 	private final ColComparisonService comparisonService;
 	private final ColComparisonHistoryService comparisonHistoryService;
 	private final GenerationScheduleRepository generationScheduleRepository;
-	private final ComparisonScheduleRepository comparisonScheduleRepository;
 
 	public ColComparisonController(ArchiveService archiveService,
 								   ColComparisonService comparisonService,
 								   ColComparisonHistoryService comparisonHistoryService,
-								   GenerationScheduleRepository generationScheduleRepository,
-								   ComparisonScheduleRepository comparisonScheduleRepository) {
+								   GenerationScheduleRepository generationScheduleRepository) {
 		this.archiveService = archiveService;
 		this.comparisonService = comparisonService;
 		this.comparisonHistoryService = comparisonHistoryService;
 		this.generationScheduleRepository = generationScheduleRepository;
-		this.comparisonScheduleRepository = comparisonScheduleRepository;
 	}
 
 	@GetMapping
@@ -51,12 +45,20 @@ public class ColComparisonController {
 	}
 
 	@GetMapping("/historique")
-	public String historique(@RequestParam(required = false) Long suiviId, Model model) {
-		List<ColComparisonHistory> entries = suiviId != null
-				? comparisonHistoryService.findBySuivi(suiviId)
-				: comparisonHistoryService.findAll();
+	public String historique(@RequestParam(required = false) Long suiviId,
+							 @RequestParam(required = false) Long planificateurId,
+							 Model model) {
+		List<ColComparisonHistory> entries;
+		if (planificateurId != null) {
+			entries = comparisonHistoryService.findByPlanificateurTrendDesc(planificateurId);
+		} else if (suiviId != null) {
+			entries = comparisonHistoryService.findBySuivi(suiviId);
+		} else {
+			entries = comparisonHistoryService.findAll();
+		}
 		model.addAttribute("entries", entries);
 		model.addAttribute("suiviId", suiviId);
+		model.addAttribute("planificateurId", planificateurId);
 		return "comparaison/historique";
 	}
 
@@ -157,9 +159,15 @@ public class ColComparisonController {
 	// --- Résultat persistant ---
 
 	@GetMapping("/resultat/{id}")
-	public String resultat(@PathVariable Long id, Model model) {
+	public String resultat(@PathVariable Long id, Model model) throws IOException {
 		ColComparisonHistory history = comparisonHistoryService.findById(id);
 		ColComparisonResult result = comparisonHistoryService.toResult(history);
+
+		if (result.diffs().isEmpty()
+				&& history.getFichierA() != null
+				&& history.getFichierB() != null) {
+			result = comparisonService.compare(history.getFichierA(), history.getFichierB());
+		}
 
 		model.addAttribute("result", result);
 		model.addAttribute("history", history);
@@ -169,52 +177,17 @@ public class ColComparisonController {
 		return "comparaison/resultat";
 	}
 
-	// --- Cas 3 : suivi périodique ---
+	// --- Cas 3 : tendances par planificateur ---
 
 	@GetMapping("/suivi")
 	public String suiviList(Model model) {
-		model.addAttribute("schedules", comparisonScheduleRepository.findAll());
+		model.addAttribute("schedules", generationScheduleRepository.findAll());
 		return "comparaison/suivi-list";
-	}
-
-	@GetMapping("/suivi/new")
-	public String suiviNew(Model model) {
-		ComparisonSchedule schedule = new ComparisonSchedule();
-		schedule.setActive(true);
-		schedule.setFrequenceJours(2);
-		schedule.setDateDebut(LocalDateTime.now().minusMonths(1));
-		schedule.setDateFin(LocalDateTime.now().plusMonths(6));
-		model.addAttribute("schedule", schedule);
-		return "comparaison/suivi-form";
-	}
-
-	@PostMapping("/suivi/save")
-	public String suiviSave(@ModelAttribute ComparisonSchedule schedule) {
-		if (schedule.getCreatedAt() == null) {
-			schedule.setCreatedAt(LocalDateTime.now());
-		}
-		schedule.setUpdatedAt(LocalDateTime.now());
-		comparisonScheduleRepository.save(schedule);
-		return "redirect:/comparaison/suivi";
-	}
-
-	@GetMapping("/suivi/edit/{id}")
-	public String suiviEdit(@PathVariable Long id, Model model) {
-		ComparisonSchedule schedule = comparisonScheduleRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Suivi introuvable"));
-		model.addAttribute("schedule", schedule);
-		return "comparaison/suivi-form";
-	}
-
-	@GetMapping("/suivi/delete/{id}")
-	public String suiviDelete(@PathVariable Long id) {
-		comparisonScheduleRepository.deleteById(id);
-		return "redirect:/comparaison/suivi";
 	}
 
 	@GetMapping("/suivi/{id}")
 	public String suiviDashboard(@PathVariable Long id, Model model) throws IOException {
-		populateSuiviDashboard(id, model, null, null, null);
+		populatePlanificateurTrendDashboard(id, model, null, null, null);
 		return "comparaison/suivi-dashboard";
 	}
 
@@ -230,7 +203,7 @@ public class ColComparisonController {
 		}
 		try {
 			List<FileComparisonChartPoint> chartData = comparisonService.buildChartData(fichierA, fichierB);
-			populateSuiviDashboard(id, model, fichierA, fichierB, chartData);
+			populatePlanificateurTrendDashboard(id, model, fichierA, fichierB, chartData);
 			return "comparaison/suivi-dashboard";
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("graphError", e.getMessage());
@@ -238,33 +211,37 @@ public class ColComparisonController {
 		}
 	}
 
-	private void populateSuiviDashboard(Long id, Model model,
-										String graphFichierA, String graphFichierB,
-										List<FileComparisonChartPoint> chartData) throws IOException {
-		ComparisonSchedule schedule = comparisonScheduleRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Suivi introuvable"));
+	private void populatePlanificateurTrendDashboard(Long id, Model model,
+												   String graphFichierA, String graphFichierB,
+												   List<FileComparisonChartPoint> chartData) throws IOException {
+		GenerationSchedule schedule = generationScheduleRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Planificateur introuvable"));
 
-		List<ComparisonTrendPoint> trends = comparisonService.syncAndGetTrend(schedule, currentUsername());
-		List<ColComparisonHistory> historiqueSuivi = comparisonHistoryService.findBySuivi(id);
+		List<ComparisonTrendPoint> trends = comparisonService.syncAndGetTrendForPlanificateur(schedule, currentUsername());
+		List<ColComparisonHistory> historiqueTrend = comparisonHistoryService.findByPlanificateurTrendDesc(id);
+		List<GenerationColHistory> fichiersPlanificateur = comparisonService.filesForPlanificateur(schedule);
 
 		ColComparisonResult latest = null;
 		String latestError = null;
 		Long latestId = null;
 
-		if (!historiqueSuivi.isEmpty()) {
-			ColComparisonHistory last = historiqueSuivi.getFirst();
+		if (!historiqueTrend.isEmpty()) {
+			ColComparisonHistory last = historiqueTrend.getFirst();
 			latest = comparisonHistoryService.toResult(last);
 			latestId = last.getId();
-		} else {
+		} else if (fichiersPlanificateur.size() >= 2) {
 			try {
-				ColComparisonResult computed = comparisonService.latestPairComparison(schedule);
+				ColComparisonResult computed = comparisonService.latestPairComparisonForPlanificateur(schedule);
 				ColComparisonHistory saved = comparisonHistoryService.save(
-						computed, "SUIVI", currentUsername(), id, null);
+						computed, "TENDANCE", currentUsername(), null, id);
 				latest = computed;
 				latestId = saved.getId();
+				trends = comparisonService.syncAndGetTrendForPlanificateur(schedule, currentUsername());
 			} catch (Exception e) {
 				latestError = e.getMessage();
 			}
+		} else {
+			latestError = "Au moins deux fichiers générés par ce planificateur sont nécessaires.";
 		}
 
 		model.addAttribute("schedule", schedule);
@@ -272,7 +249,7 @@ public class ColComparisonController {
 		model.addAttribute("latest", latest);
 		model.addAttribute("latestId", latestId);
 		model.addAttribute("latestError", latestError);
-		model.addAttribute("fichiers", archiveService.getAllArchives());
+		model.addAttribute("fichiers", fichiersPlanificateur);
 		model.addAttribute("graphFichierA", graphFichierA);
 		model.addAttribute("graphFichierB", graphFichierB);
 		model.addAttribute("chartData", chartData);

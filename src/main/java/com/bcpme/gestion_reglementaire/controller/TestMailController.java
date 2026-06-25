@@ -17,7 +17,7 @@ public class TestMailController {
     public String testMail() {
 
         mailService.envoyerMail(
-                "nkamolga@gmail.com",
+                mailService.getAlertRecipient(),
                 "Test BKCOM",
                 "Test d'envoi de mail depuis Spring Boot");
 

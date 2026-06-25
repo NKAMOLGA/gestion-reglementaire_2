@@ -84,6 +84,18 @@ public class ColComparisonService {
 	}
 
 	public List<GenerationColHistory> filesForSchedule(GenerationSchedule schedule) {
+		return filesForPlanificateur(schedule);
+	}
+
+	public List<GenerationColHistory> filesForPlanificateur(GenerationSchedule schedule) {
+		List<GenerationColHistory> linked = historyRepository
+				.findByStatutAndGenerationScheduleIdAndNomFichierIsNotNullOrderByDateGenerationAsc(
+						"SUCCESS", schedule.getId());
+
+		if (!linked.isEmpty()) {
+			return linked;
+		}
+
 		LocalDateTime debut = schedule.getDateDebut() != null
 				? schedule.getDateDebut()
 				: LocalDateTime.now().minusYears(1);
@@ -94,6 +106,50 @@ public class ColComparisonService {
 		return historyRepository
 				.findByStatutAndDateGenerationBetweenAndNomFichierIsNotNullOrderByDateGenerationAsc(
 						"SUCCESS", debut, fin);
+	}
+
+	public List<ComparisonTrendPoint> syncAndGetTrendForPlanificateur(GenerationSchedule schedule,
+																	  String utilisateur) throws IOException {
+		syncPlanificateurComparisons(schedule, utilisateur);
+		return comparisonHistoryService.findByPlanificateurTrendAsc(schedule.getId()).stream()
+				.map(comparisonHistoryService::toTrendPoint)
+				.toList();
+	}
+
+	private void syncPlanificateurComparisons(GenerationSchedule schedule, String utilisateur) throws IOException {
+		List<GenerationColHistory> files = filesForPlanificateur(schedule);
+
+		if (files.size() < 2) {
+			return;
+		}
+
+		java.util.Set<String> existingPairs = comparisonHistoryService.findByPlanificateurTrendAsc(schedule.getId()).stream()
+				.map(h -> h.getFichierA() + "|" + h.getFichierB())
+				.collect(java.util.stream.Collectors.toSet());
+
+		for (int i = 1; i < files.size(); i++) {
+			String fichierA = files.get(i - 1).getNomFichier();
+			String fichierB = files.get(i).getNomFichier();
+			String pairKey = fichierA + "|" + fichierB;
+
+			if (!existingPairs.contains(pairKey)) {
+				ColComparisonResult result = compare(fichierA, fichierB);
+				comparisonHistoryService.save(result, "TENDANCE", utilisateur, null, schedule.getId());
+				existingPairs.add(pairKey);
+			}
+		}
+	}
+
+	public ColComparisonResult latestPairComparisonForPlanificateur(GenerationSchedule schedule) throws IOException {
+		List<GenerationColHistory> files = filesForPlanificateur(schedule);
+
+		if (files.size() < 2) {
+			throw new IllegalStateException("Au moins deux fichiers sont nécessaires pour une comparaison");
+		}
+
+		GenerationColHistory older = files.get(files.size() - 2);
+		GenerationColHistory newer = files.get(files.size() - 1);
+		return compare(older.getNomFichier(), newer.getNomFichier());
 	}
 
 	public List<ComparisonTrendPoint> syncAndGetTrend(ComparisonSchedule schedule, String utilisateur)

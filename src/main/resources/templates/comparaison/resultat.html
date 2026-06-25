@@ -11,20 +11,6 @@
 
 			<div class="kpi-grid">
 				<div class="kpi-card">
-					<div class="kpi-card__icon kpi-card__icon--success"><i class="bi bi-plus-circle"></i></div>
-					<div>
-						<div class="kpi-card__label">Ajoutés</div>
-						<div class="kpi-card__value" th:text="*{addedCount}">0</div>
-					</div>
-				</div>
-				<div class="kpi-card">
-					<div class="kpi-card__icon kpi-card__icon--danger"><i class="bi bi-dash-circle"></i></div>
-					<div>
-						<div class="kpi-card__label">Supprimés</div>
-						<div class="kpi-card__value" th:text="*{removedCount}">0</div>
-					</div>
-				</div>
-				<div class="kpi-card">
 					<div class="kpi-card__icon kpi-card__icon--primary"><i class="bi bi-currency-exchange"></i></div>
 					<div>
 						<div class="kpi-card__label">Delta total montants</div>
@@ -88,7 +74,7 @@
 							</tr>
 							</thead>
 							<tbody>
-							<tr th:each="d : *{significantDiffs()}">
+							<tr th:each="d : *{diffs}">
 								<td th:text="${d.code}"></td>
 								<td th:text="${d.libelleA} ?: '—'"></td>
 								<td th:text="${d.montantA} ?: '—'"></td>
@@ -96,19 +82,20 @@
 								<td th:text="${d.montantB} ?: '—'"></td>
 								<td>
 									<span th:classappend="${d.delta != null and d.delta.signum() > 0} ? 'text-success' : (${d.delta != null and d.delta.signum() < 0} ? 'text-danger' : '')"
-										  th:text="${d.delta}"></span>
+										  th:text="${d.delta} ?: '—'"></span>
 								</td>
 								<td>
 									<span th:if="${d.changeType.name() == 'ADDED'}" class="badge-status badge-status--success">Ajouté</span>
 									<span th:if="${d.changeType.name() == 'REMOVED'}" class="badge-status badge-status--danger">Supprimé</span>
 									<span th:if="${d.changeType.name() == 'MODIFIED'}" class="badge-status badge-status--info">Modifié</span>
+									<span th:if="${d.changeType.name() == 'UNCHANGED'}" class="badge-status badge-status--neutral">Stable</span>
 								</td>
 							</tr>
-							<tr th:if="${#lists.isEmpty(result.significantDiffs())}">
+							<tr th:if="${#lists.isEmpty(result.diffs)}">
 								<td colspan="7">
 									<div class="empty-state">
 										<i class="bi bi-check-circle"></i>
-										<p>Aucune différence significative entre les deux fichiers</p>
+										<p>Aucune ligne à afficher pour cette comparaison</p>
 									</div>
 								</td>
 							</tr>
@@ -126,6 +113,11 @@
 				</a>
 				<a th:if="${source == 'MANUELLE'}" th:href="@{/comparaison/manuelle}" class="btn btn-outline-secondary">
 					<i class="bi bi-arrow-left"></i> Nouvelle comparaison
+				</a>
+				<a th:if="${source == 'TENDANCE' and scheduleId != null}"
+				   th:href="@{'/comparaison/suivi/' + ${scheduleId}}"
+				   class="btn btn-outline-secondary">
+					<i class="bi bi-graph-up"></i> Retour aux tendances
 				</a>
 				<a th:if="${source == 'SUIVI' and suiviId != null}"
 				   th:href="@{'/comparaison/suivi/' + ${suiviId}}"

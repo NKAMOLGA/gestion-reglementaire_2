@@ -10,6 +10,10 @@
 		<div class="page-content">
 
 			<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+				<div th:if="${planificateurId != null}" class="text-muted">
+					<i class="bi bi-funnel me-1"></i> Filtré par planificateur #<span th:text="${planificateurId}"></span>
+					<a th:href="@{/comparaison/historique}" class="ms-2">Voir tout</a>
+				</div>
 				<div th:if="${suiviId != null}" class="text-muted">
 					<i class="bi bi-funnel me-1"></i> Filtré par suivi #<span th:text="${suiviId}"></span>
 					<a th:href="@{/comparaison/historique}" class="ms-2">Voir tout</a>
@@ -29,11 +33,8 @@
 							<thead>
 							<tr>
 								<th>Date</th>
-								<th>Mode</th>
 								<th>Fichier A</th>
 								<th>Fichier B</th>
-								<th>Modifiés</th>
-								<th>Delta</th>
 								<th>Action</th>
 							</tr>
 							</thead>
@@ -48,11 +49,7 @@
 							</tr>
 							<tr th:each="e : ${entries}">
 								<td th:text="${#temporals.format(e.dateComparaison, 'dd/MM/yyyy HH:mm')}"></td>
-								<td>
-									<span th:if="${e.mode == 'MANUELLE'}" class="badge-status badge-status--info">Manuelle</span>
-									<span th:if="${e.mode == 'PLANIFICATEUR'}" class="badge-status badge-status--neutral">Planificateur</span>
-									<span th:if="${e.mode == 'SUIVI'}" class="badge-status badge-status--success">Suivi</span>
-								</td>
+								
 								<td>
 									<i class="bi bi-file-earmark-text text-muted me-1"></i>
 									<span th:text="${e.fichierA}"></span>
@@ -61,8 +58,6 @@
 									<i class="bi bi-file-earmark-text text-muted me-1"></i>
 									<span th:text="${e.fichierB}"></span>
 								</td>
-								<td th:text="${e.modifiedCount}"></td>
-								<td th:text="${e.totalDelta}"></td>
 								<td>
 									<a th:href="@{'/comparaison/resultat/' + ${e.id}}" class="btn btn-primary btn-sm">
 										<i class="bi bi-eye"></i> Voir le rendu

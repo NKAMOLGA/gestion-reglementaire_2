@@ -12,4 +12,10 @@ public interface ColComparisonHistoryRepository extends JpaRepository<ColCompari
 	List<ColComparisonHistory> findByComparisonScheduleIdOrderByDateComparaisonDesc(Long comparisonScheduleId);
 
 	List<ColComparisonHistory> findByComparisonScheduleIdOrderByDateComparaisonAsc(Long comparisonScheduleId);
+
+	List<ColComparisonHistory> findByGenerationScheduleIdAndModeOrderByDateComparaisonAsc(
+			Long generationScheduleId, String mode);
+
+	List<ColComparisonHistory> findByGenerationScheduleIdAndModeOrderByDateComparaisonDesc(
+			Long generationScheduleId, String mode);
 }

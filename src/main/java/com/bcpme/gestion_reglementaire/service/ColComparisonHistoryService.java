@@ -20,9 +20,12 @@ public class ColComparisonHistoryService {
 
 	private final ColComparisonHistoryRepository repository;
 	private final ObjectMapper objectMapper;
+	private final ColComparisonAlertService comparisonAlertService;
 
-	public ColComparisonHistoryService(ColComparisonHistoryRepository repository) {
+	public ColComparisonHistoryService(ColComparisonHistoryRepository repository,
+									   ColComparisonAlertService comparisonAlertService) {
 		this.repository = repository;
+		this.comparisonAlertService = comparisonAlertService;
 		this.objectMapper = new ObjectMapper()
 				.registerModule(new JavaTimeModule())
 				.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -51,7 +54,9 @@ public class ColComparisonHistoryService {
 		history.setUnchangedCount(result.unchangedCount());
 		history.setTotalDelta(result.totalDelta());
 		history.setDetailsJson(serializeDiffs(result.diffs()));
-		return repository.save(history);
+		ColComparisonHistory saved = repository.save(history);
+		comparisonAlertService.notifyComparison(result, mode, utilisateur, saved.getId());
+		return saved;
 	}
 
 	public ColComparisonResult toResult(ColComparisonHistory history) {
@@ -99,6 +104,14 @@ public class ColComparisonHistoryService {
 
 	public List<ColComparisonHistory> findBySuiviAsc(Long comparisonScheduleId) {
 		return repository.findByComparisonScheduleIdOrderByDateComparaisonAsc(comparisonScheduleId);
+	}
+
+	public List<ColComparisonHistory> findByPlanificateurTrendAsc(Long generationScheduleId) {
+		return repository.findByGenerationScheduleIdAndModeOrderByDateComparaisonAsc(generationScheduleId, "TENDANCE");
+	}
+
+	public List<ColComparisonHistory> findByPlanificateurTrendDesc(Long generationScheduleId) {
+		return repository.findByGenerationScheduleIdAndModeOrderByDateComparaisonDesc(generationScheduleId, "TENDANCE");
 	}
 
 	public ComparisonTrendPoint toTrendPoint(ColComparisonHistory history) {

@@ -43,4 +43,7 @@ public interface GenerationColHistoryRepository extends JpaRepository<Generation
 
     List<GenerationColHistory> findByStatutAndDateGenerationBetweenAndNomFichierIsNotNullOrderByDateGenerationAsc(
             String statut, LocalDateTime debut, LocalDateTime fin);
+
+    List<GenerationColHistory> findByStatutAndGenerationScheduleIdAndNomFichierIsNotNullOrderByDateGenerationAsc(
+            String statut, Long generationScheduleId);
 }
