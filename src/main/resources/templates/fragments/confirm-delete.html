@@ -4,14 +4,14 @@
 			<div class="confirm-dialog__icon">
 				<i class="bi bi-exclamation-triangle"></i>
 			</div>
-			<h3 id="deleteConfirmTitle" class="confirm-dialog__title">Confirmer la suppression</h3>
-			<p id="deleteConfirmMessage" class="confirm-dialog__text">Voulez-vous vraiment supprimer cet élément ?</p>
+			<h3 id="deleteConfirmTitle" class="confirm-dialog__title" th:text="#{common.confirmDelete.title}">Confirmer la suppression</h3>
+			<p id="deleteConfirmMessage" class="confirm-dialog__text" th:text="#{common.confirmDelete.message}">Voulez-vous vraiment supprimer cet élément ?</p>
 			<div class="confirm-dialog__actions">
 				<button type="button" class="btn btn-outline-secondary" id="deleteConfirmCancel">
-					<i class="bi bi-x-lg"></i> Annuler
+					<i class="bi bi-x-lg"></i> <span th:text="#{common.cancel}">Annuler</span>
 				</button>
 				<a id="deleteConfirmLink" class="btn btn-danger" href="#">
-					<i class="bi bi-trash"></i> Supprimer
+					<i class="bi bi-trash"></i> <span th:text="#{common.delete}">Supprimer</span>
 				</a>
 			</div>
 		</div>

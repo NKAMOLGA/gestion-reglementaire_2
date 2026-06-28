@@ -19,14 +19,21 @@ public class ColArchiveHelper {
 
 	/**
 	 * Format : COLLECTE-CM-10036-20260615-143052-10.Col
+	 * Le suffixe final est le jour planifié (10, 20…) pour les générations planificateur.
 	 */
 	public String buildArchiveFileName(String institutionCode, LocalDate businessDate, LocalDateTime generationTime) {
+		return buildArchiveFileName(institutionCode, businessDate, generationTime, null);
+	}
+
+	public String buildArchiveFileName(String institutionCode, LocalDate businessDate, LocalDateTime generationTime,
+									   Integer plannerDaySuffix) {
 		String code = institutionCode != null && !institutionCode.isBlank()
 				? institutionCode
 				: INSTITUTION_CODE_DEFAULT;
 		String datePart = businessDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 		String timePart = generationTime.format(DateTimeFormatter.ofPattern("HHmmss"));
-		return String.format("COLLECTE-CM-%s-%s-%s-10.Col", code, datePart, timePart);
+		int suffix = plannerDaySuffix != null ? plannerDaySuffix : 10;
+		return String.format("COLLECTE-CM-%s-%s-%s-%d.Col", code, datePart, timePart, suffix);
 	}
 
 	public List<String> readLines(Path path) throws IOException {

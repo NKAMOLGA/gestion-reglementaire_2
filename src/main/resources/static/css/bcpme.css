@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   BC-PME — Gestion Réglementaire — Design System (Light)
+   BC-PME — Réserve Obligatoire — Design System (Light)
    Inspiré dashboard moderne : sidebar verte, cartes arrondies
    ══════════════════════════════════════════════════════════════ */
 
@@ -132,6 +132,30 @@ body {
 	flex-shrink: 0;
 }
 
+.lang-toggle {
+	min-width: 40px;
+	height: 40px;
+	padding: 0 0.5rem;
+	border-radius: 999px;
+	border: 1px solid var(--bcpme-gray-200);
+	background: var(--bcpme-gray-50);
+	color: var(--bcpme-gray-600);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.25rem;
+	cursor: pointer;
+	font-size: 0.75rem;
+	font-weight: 700;
+	transition: all var(--bcpme-transition);
+	flex-shrink: 0;
+}
+
+.lang-toggle__label {
+	line-height: 1;
+}
+
+.lang-toggle:hover,
 .theme-toggle:hover {
 	background: var(--bcpme-green-light);
 	color: var(--bcpme-green-dark);
@@ -530,6 +554,23 @@ body {
 .app-table tbody tr:hover td { background: var(--bcpme-green-50); }
 .app-table .actions { display: flex; flex-wrap: wrap; gap: 0.375rem; }
 
+.comparison-matrix__header-link {
+	color: inherit;
+	font-weight: 600;
+	text-decoration: none;
+	border-bottom: 1px dashed var(--bcpme-green-500);
+}
+
+.comparison-matrix__header-link:hover {
+	color: var(--bcpme-green-600);
+	border-bottom-color: var(--bcpme-green-600);
+}
+
+.comparison-matrix tbody td:first-child {
+	font-weight: 600;
+	white-space: nowrap;
+}
+
 /* ── Badges ── */
 
 .badge-status {
@@ -850,13 +891,77 @@ body {
 	margin: 0;
 }
 
-.login-theme-toggle {
+.login-toolbar {
 	position: fixed;
 	top: 1.25rem;
 	right: 1.25rem;
 	z-index: 200;
+	display: flex;
+	gap: 0.5rem;
+}
+
+.login-theme-toggle,
+.login-lang-toggle {
 	background: var(--bcpme-white);
 	box-shadow: var(--bcpme-shadow);
+}
+
+.chart-container {
+	position: relative;
+	width: 100%;
+}
+
+.chart-container--trend {
+	min-height: 320px;
+	height: 320px;
+}
+
+.chart-container--compare {
+	min-height: 280px;
+	height: 280px;
+}
+
+.schedule-form-card {
+	max-width: 820px;
+}
+
+.schedule-trigger-panel {
+	border: 1px solid var(--bcpme-gray-200);
+	border-radius: var(--bcpme-radius);
+	padding: 1rem;
+	margin-bottom: 1rem;
+	background: var(--bcpme-gray-50);
+}
+
+.schedule-month-grid,
+.schedule-day-grid {
+	display: grid;
+	gap: 0.5rem;
+}
+
+.schedule-month-grid {
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
+.schedule-day-grid {
+	grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+}
+
+.schedule-check {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.35rem 0.5rem;
+	border: 1px solid var(--bcpme-gray-200);
+	border-radius: 0.5rem;
+	background: var(--bcpme-white);
+	font-size: 0.875rem;
+	margin: 0;
+	cursor: pointer;
+}
+
+.schedule-check input {
+	margin: 0;
 }
 
 /* ── Responsive ── */

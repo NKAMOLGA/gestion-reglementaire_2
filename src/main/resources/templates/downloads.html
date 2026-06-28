@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/head :: head('Téléchargements')}"></head>
-<body class="app-body" th:with="pageTitle='Téléchargements', pageSubtitle='Fichiers COL disponibles'">
+<head th:replace="~{fragments/head :: head(#{downloads.pageTitle})}"></head>
+<body class="app-body" th:with="pageTitle=#{downloads.pageTitle},pageSubtitle=#{downloads.pageSubtitle}">
 <div class="app-shell">
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 	<main class="app-main">
@@ -13,18 +13,22 @@
 					<div class="app-table-wrap">
 						<table class="app-table">
 							<thead>
-							<tr><th>Nom du fichier</th><th>Taille</th><th>Action</th></tr>
+							<tr>
+								<th th:text="#{common.filename}">Nom du fichier</th>
+								<th th:text="#{common.size}">Taille</th>
+								<th th:text="#{common.action}">Action</th>
+							</tr>
 							</thead>
 							<tbody>
 							<tr th:if="${#lists.isEmpty(fichiers)}">
-								<td colspan="3"><div class="empty-state"><i class="bi bi-folder2-open"></i><p>Aucun fichier disponible</p></div></td>
+								<td colspan="3"><div class="empty-state"><i class="bi bi-folder2-open"></i><p th:text="#{downloads.empty}">Aucun fichier disponible</p></div></td>
 							</tr>
 							<tr th:each="f : ${fichiers}">
 								<td><i class="bi bi-file-earmark-text text-muted me-1"></i><span th:text="${f.name}"></span></td>
-								<td th:text="${f.size + ' octets'}"></td>
+								<td th:text="#{common.fileSize.bytes(${f.size})}"></td>
 								<td>
 									<a class="btn btn-primary btn-sm" th:href="@{'/downloads/file'(filename=${f.name})}">
-										<i class="bi bi-download"></i> Télécharger
+										<i class="bi bi-download"></i> <span th:text="#{common.download}">Télécharger</span>
 									</a>
 								</td>
 							</tr>

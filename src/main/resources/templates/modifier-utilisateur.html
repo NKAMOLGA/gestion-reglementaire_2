@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/head :: head('Modifier utilisateur')}"></head>
-<body class="app-body" th:with="pageTitle='Modifier utilisateur', pageSubtitle='Mettre à jour le compte'">
+<head th:replace="~{fragments/head :: head(#{users.edit.pageTitle})}"></head>
+<body class="app-body" th:with="pageTitle=#{users.edit.pageTitle},pageSubtitle=#{users.edit.pageSubtitle}">
 <div class="app-shell">
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 	<main class="app-main">
@@ -13,29 +13,29 @@
 					<form th:action="@{/utilisateurs/save}" method="post" th:object="${utilisateur}">
 						<input type="hidden" th:field="*{id}">
 						<div class="mb-3">
-							<label class="form-label"><i class="bi bi-person me-1"></i> Nom d'utilisateur</label>
+							<label class="form-label"><i class="bi bi-person me-1"></i> <span th:text="#{common.username}">Nom d'utilisateur</span></label>
 							<input type="text" class="form-control" th:field="*{username}" required>
 						</div>
 						<div class="mb-3">
-							<label class="form-label"><i class="bi bi-key me-1"></i> Mot de passe</label>
+							<label class="form-label"><i class="bi bi-key me-1"></i> <span th:text="#{common.password}">Mot de passe</span></label>
 							<input type="password" class="form-control" th:field="*{password}">
 						</div>
 						<div class="mb-3">
-							<label class="form-label"><i class="bi bi-shield me-1"></i> Rôle</label>
+							<label class="form-label"><i class="bi bi-shield me-1"></i> <span th:text="#{common.role}">Rôle</span></label>
 							<select class="form-select" th:field="*{role}">
 								<option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.name}"></option>
 							</select>
 						</div>
 						<div class="mb-3">
-							<label class="form-label"><i class="bi bi-toggle-on me-1"></i> Statut</label>
+							<label class="form-label"><i class="bi bi-toggle-on me-1"></i> <span th:text="#{common.status}">Statut</span></label>
 							<select class="form-select" th:field="*{actif}">
-								<option value="true">Actif</option>
-								<option value="false">Bloqué</option>
+								<option value="true" th:text="#{common.status.active}">Actif</option>
+								<option value="false" th:text="#{common.status.blocked}">Bloqué</option>
 							</select>
 						</div>
 						<div class="form-actions">
-							<button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Enregistrer</button>
-							<a th:href="@{/utilisateurs}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Annuler</a>
+							<button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> <span th:text="#{common.save}">Enregistrer</span></button>
+							<a th:href="@{/utilisateurs}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> <span th:text="#{common.cancel}">Annuler</span></a>
 						</div>
 					</form>
 				</div>

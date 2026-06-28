@@ -6,7 +6,7 @@
 	<div class="sidebar-brand">
 		<img th:src="@{/images/bc-pme-logo.png}" alt="BC-PME" class="sidebar-brand__logo">
 		<div class="sidebar-brand__text">
-			<span class="sidebar-brand__name">Gestion Réglementaire</span>
+			<span class="sidebar-brand__name" th:text="#{app.title}">Réserve Obligatoire</span>
 			<span class="sidebar-brand__org">BC-PME SA</span>
 		</div>
 	</div>
@@ -16,50 +16,55 @@
 		   th:classappend="${#strings.startsWith(currentUri, '/dashboard')} ? ' active' : ''"
 		   th:href="@{/dashboard}">
 			<i class="bi bi-speedometer2"></i>
-			<span>Tableau de bord</span>
+			<span th:text="#{nav.dashboard}">Tableau de bord</span>
 		</a>
 
 		<a class="sidebar-link"
+		   sec:authorize="!hasAuthority('DSIO')"
 		   th:classappend="${#strings.startsWith(currentUri, '/generation-col')} ? ' active' : ''"
 		   th:href="@{/generation-col}">
 			<i class="bi bi-file-earmark-arrow-up"></i>
-			<span>Génération COL</span>
+			<span th:text="#{nav.col.generation}">Génération COL</span>
 		</a>
 
 		<a class="sidebar-link"
+		   sec:authorize="!hasAuthority('DSIO')"
 		   th:classappend="${#strings.startsWith(currentUri, '/historique')} ? ' active' : ''"
 		   th:href="@{/historique}">
 			<i class="bi bi-clock-history"></i>
-			<span>Historique</span>
+			<span th:text="#{nav.history}">Historique</span>
 		</a>
 
 		<a class="sidebar-link"
+		   sec:authorize="!hasAuthority('DSIO')"
 		   th:classappend="${#strings.startsWith(currentUri, '/downloads')} ? ' active' : ''"
 		   th:href="@{/downloads}">
 			<i class="bi bi-download"></i>
-			<span>Téléchargements</span>
+			<span th:text="#{nav.downloads}">Téléchargements</span>
 		</a>
 
-		<a class="sidebar-link"
-		   th:classappend="${#strings.startsWith(currentUri, '/comparaison')} ? ' active' : ''"
-		   th:href="@{/comparaison}">
-			<i class="bi bi-arrow-left-right"></i>
-			<span>Analyse comparative</span>
-		</a>
+		
 
 		<a class="sidebar-link"
+		   sec:authorize="!hasAuthority('DSIO')"
 		   th:classappend="${#strings.startsWith(currentUri, '/schedules')} ? ' active' : ''"
 		   th:href="@{/schedules}">
 			<i class="bi bi-calendar-check"></i>
-			<span>Planification COL</span>
+			<span th:text="#{nav.schedules}">Planification COL</span>
 		</a>
-
+		<a class="sidebar-link"
+		   sec:authorize="!hasAuthority('DSIO')"
+		   th:classappend="${#strings.startsWith(currentUri, '/comparaison')} ? ' active' : ''"
+		   th:href="@{/comparaison}">
+			<i class="bi bi-arrow-left-right"></i>
+			<span th:text="#{nav.comparison}">Analyse comparative</span>
+		</a>
 		<a class="sidebar-link"
 		   sec:authorize="hasAuthority('DSIO')"
 		   th:classappend="${#strings.startsWith(currentUri, '/utilisateurs')} ? ' active' : ''"
 		   th:href="@{/utilisateurs}">
 			<i class="bi bi-people"></i>
-			<span>Utilisateurs</span>
+			<span th:text="#{nav.users}">Utilisateurs</span>
 		</a>
 	</nav>
 
@@ -67,7 +72,7 @@
 		<form th:action="@{/logout}" method="post">
 			<button type="submit" class="sidebar-link sidebar-link--logout">
 				<i class="bi bi-box-arrow-left"></i>
-				<span>Déconnexion</span>
+				<span th:text="#{nav.logout}">Déconnexion</span>
 			</button>
 		</form>
 	</div>

@@ -11,155 +11,101 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class GenerationScheduleJob {
 
-    private final GenerationScheduleRepository repository;
-    private final GenerationColService generationColService;
+	private final GenerationScheduleRepository repository;
+	private final GenerationColService generationColService;
+	private final ScheduleNextRunService nextRunService;
 
-    /**
-     * 🔥 CALCUL UNIQUE DU PROCHAIN LANCEMENT
-     */
-    private LocalDateTime computeNextRun(GenerationSchedule s, LocalDate baseDate) {
+	@PostConstruct
+	public void catchMissedExecutions() {
+		System.out.println("=== Vérification des exécutions manquées ===");
 
-        if (s.getHeureExecution() == null || baseDate == null) {
-            return null;
-        }
+		LocalDateTime now = LocalDateTime.now();
+		List<GenerationSchedule> schedules = repository.findByActiveTrue();
 
-        return LocalDateTime.of(baseDate, s.getHeureExecution());
-    }
+		for (GenerationSchedule schedule : schedules) {
+			try {
+				ensureNextRunDate(schedule);
 
-    /**
-     * 🔥 RATTRAPAGE AU DÉMARRAGE
-     */
-    @PostConstruct
-    public void catchMissedExecutions() {
+				List<LocalDateTime> missed = nextRunService.findMissedRuns(schedule, now);
+				for (LocalDateTime executionAt : missed) {
+					if (schedule.getDateFin() != null && executionAt.isAfter(schedule.getDateFin())) {
+						break;
+					}
 
-        System.out.println("=== Vérification des exécutions manquées ===");
+					System.out.println("RATTRAPAGE : " + schedule.getNom() + " @ " + executionAt);
+					Integer plannerDay = nextRunService.resolvePlannerDaySuffix(schedule, executionAt);
+					LocalDate businessDate = nextRunService.resolveBusinessDate(schedule, executionAt);
+					generationColService.lancerGeneration("PLANIFICATEUR", schedule.getId(), plannerDay, businessDate);
+					schedule.setDerniereExecution(executionAt);
+					schedule.setNextRunDate(nextRunService.computeNextRun(schedule, executionAt));
+					repository.save(schedule);
+				}
+			} catch (Exception e) {
+				System.err.println("Erreur rattrapage : " + schedule.getNom());
+				e.printStackTrace();
+			}
+		}
+	}
 
-        List<GenerationSchedule> schedules = repository.findByActiveTrue();
+	@Scheduled(fixedRate = 60000)
+	public void executeSchedules() {
+		LocalDateTime now = LocalDateTime.now();
+		List<GenerationSchedule> schedules = repository.findByActiveTrue();
 
-        for (GenerationSchedule schedule : schedules) {
+		for (GenerationSchedule schedule : schedules) {
+			try {
+				if (schedule.getDateDebut() != null && now.isBefore(schedule.getDateDebut())) {
+					continue;
+				}
+				if (schedule.getDateFin() != null && now.isAfter(schedule.getDateFin())) {
+					continue;
+				}
 
-            try {
+				ensureNextRunDate(schedule);
 
-                if (schedule.getDateDebut() == null || schedule.getHeureExecution() == null) {
-                    continue;
-                }
+				LocalDateTime nextRun = schedule.getNextRunDate();
+				if (nextRun == null || now.isBefore(nextRun)) {
+					continue;
+				}
 
-                int frequence = (schedule.getFrequenceJours() == null) ? 1 : schedule.getFrequenceJours();
+				// Fenêtre d'une minute (comme le poll toutes les 60 s)
+				if (now.isAfter(nextRun.plusMinutes(1))) {
+					List<LocalDateTime> missed = nextRunService.findMissedRuns(schedule, now);
+					if (missed.isEmpty()) {
+						schedule.setNextRunDate(nextRunService.computeNextRun(schedule, now));
+						repository.save(schedule);
+						continue;
+					}
+					nextRun = missed.getFirst();
+				}
 
-                LocalDate prochaineDate;
+				System.out.println("EXÉCUTION : " + schedule.getNom() + " @ " + nextRun);
+				Integer plannerDay = nextRunService.resolvePlannerDaySuffix(schedule, nextRun);
+				LocalDate businessDate = nextRunService.resolveBusinessDate(schedule, nextRun);
+				generationColService.lancerGeneration("PLANIFICATEUR", schedule.getId(), plannerDay, businessDate);
 
-                if (schedule.getDerniereExecution() == null) {
-                    prochaineDate = schedule.getDateDebut().toLocalDate();
-                } else {
-                    prochaineDate = schedule.getDerniereExecution()
-                            .toLocalDate()
-                            .plusDays(frequence);
-                }
+				schedule.setDerniereExecution(nextRun);
+				schedule.setNextRunDate(nextRunService.computeNextRun(schedule, nextRun));
+				repository.save(schedule);
 
-                while (!prochaineDate.isAfter(LocalDate.now())) {
+			} catch (Exception e) {
+				System.err.println("Erreur exécution : " + schedule.getNom());
+				e.printStackTrace();
+			}
+		}
+	}
 
-                    LocalDateTime execution = LocalDateTime.of(
-                            prochaineDate,
-                            schedule.getHeureExecution()
-                    );
-
-                    if (schedule.getDateFin() != null
-                            && execution.isAfter(schedule.getDateFin())) {
-                        break;
-                    }
-
-                    System.out.println("RATTRAPAGE : " + schedule.getNom());
-
-                    generationColService.lancerGeneration("PLANIFICATEUR", schedule.getId());
-
-                    schedule.setDerniereExecution(execution);
-
-                    // 🔥 NEXT RUN = prochaine exécution future
-                    LocalDate nextDate = prochaineDate.plusDays(frequence);
-
-                    schedule.setNextRunDate(
-                            computeNextRun(schedule, nextDate)
-                    );
-
-                    repository.save(schedule);
-
-                    prochaineDate = nextDate;
-                }
-
-            } catch (Exception e) {
-                System.err.println("Erreur rattrapage : " + schedule.getNom());
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 🔥 EXÉCUTION PLANIFIÉE (TOUTES LES MINUTES)
-     */
-    @Scheduled(fixedRate = 60000)
-    public void executeSchedules() {
-
-        LocalDateTime now = LocalDateTime.now();
-
-        List<GenerationSchedule> schedules = repository.findByActiveTrue();
-
-        for (GenerationSchedule schedule : schedules) {
-
-            try {
-
-                if (schedule.getDateDebut() != null
-                        && now.isBefore(schedule.getDateDebut())) {
-                    continue;
-                }
-
-                if (schedule.getDateFin() != null
-                        && now.isAfter(schedule.getDateFin())) {
-                    continue;
-                }
-
-                LocalTime heure = schedule.getHeureExecution();
-
-                if (heure == null) {
-                    continue;
-                }
-
-                if (now.getHour() == heure.getHour()
-                        && now.getMinute() == heure.getMinute()) {
-
-                    // éviter double exécution jour même
-                    if (schedule.getDerniereExecution() != null
-                            && schedule.getDerniereExecution().toLocalDate().equals(LocalDate.now())) {
-                        continue;
-                    }
-
-                    int frequence = (schedule.getFrequenceJours() == null) ? 1 : schedule.getFrequenceJours();
-
-                    System.out.println("EXÉCUTION : " + schedule.getNom());
-
-                    generationColService.lancerGeneration("PLANIFICATEUR", schedule.getId());
-
-                    schedule.setDerniereExecution(now);
-
-                    LocalDate nextDate = now.toLocalDate().plusDays(frequence);
-
-                    schedule.setNextRunDate(
-                            computeNextRun(schedule, nextDate)
-                    );
-
-                    repository.save(schedule);
-                }
-
-            } catch (Exception e) {
-                System.err.println("Erreur exécution : " + schedule.getNom());
-                e.printStackTrace();
-            }
-        }
-    }
+	private void ensureNextRunDate(GenerationSchedule schedule) {
+		if (schedule.getNextRunDate() == null) {
+			LocalDateTime after = schedule.getDerniereExecution();
+			schedule.setNextRunDate(nextRunService.computeNextRun(schedule, after));
+			repository.save(schedule);
+		}
+	}
 }

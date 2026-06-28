@@ -42,11 +42,22 @@ public class GenerationColService {
     }
 
     public void lancerGeneration(String utilisateur, Long generationScheduleId) {
+        lancerGeneration(utilisateur, generationScheduleId, null);
+    }
+
+    public void lancerGeneration(String utilisateur, Long generationScheduleId, Integer plannerDaySuffix) {
+        lancerGeneration(utilisateur, generationScheduleId, plannerDaySuffix, null);
+    }
+
+    public void lancerGeneration(String utilisateur, Long generationScheduleId,
+                                 Integer plannerDaySuffix, LocalDate plannerBusinessDate) {
 
         GenerationColHistory history = new GenerationColHistory();
 
         LocalDateTime generationTime = LocalDateTime.now();
-        LocalDate businessDate = generationTime.toLocalDate().minusDays(1);
+        LocalDate businessDate = plannerBusinessDate != null
+                ? plannerBusinessDate
+                : generationTime.toLocalDate().minusDays(1);
 
         try {
 
@@ -130,7 +141,8 @@ public class GenerationColService {
                     colArchiveHelper.buildArchiveFileName(
                             institutionCode,
                             businessDate,
-                            generationTime
+                            generationTime,
+                            plannerDaySuffix
                     );
 
             Path archivePath =
@@ -167,6 +179,7 @@ public class GenerationColService {
             history.setMessage(
                     "Génération réussie - date métier : "
                             + businessDate
+                            + (plannerDaySuffix != null ? " - jour planifié : " + plannerDaySuffix : "")
             );
 
         } catch (Exception e) {

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/head :: head('Détails utilisateur')}"></head>
-<body class="app-body" th:with="pageTitle='Détails utilisateur', pageSubtitle=${utilisateur.username}">
+<head th:replace="~{fragments/head :: head(#{users.view.pageTitle})}"></head>
+<body class="app-body" th:with="pageTitle=#{users.view.pageTitle},pageSubtitle=${utilisateur.username}">
 <div class="app-shell">
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 	<main class="app-main">
@@ -11,24 +11,20 @@
 			<div class="app-card" style="max-width: 560px;">
 				<div class="app-card__body">
 					<ul class="detail-list">
-						<!--<li class="detail-list__item">
-							<span class="detail-list__label">Nom d'utilisateur</span>
-							<span class="detail-list__value" th:text="${utilisateur.username}"></span>
-						</li>-->
 						<li class="detail-list__item">
-							<span class="detail-list__label">Mot de passe</span>
+							<span class="detail-list__label" th:text="#{common.password}">Mot de passe</span>
 							<span class="detail-list__value" th:text="${utilisateur.password}"></span>
 						</li>
 						<li class="detail-list__item">
-							<span class="detail-list__label">Rôle</span>
+							<span class="detail-list__label" th:text="#{common.role}">Rôle</span>
 							<span class="detail-list__value">
 								<span class="badge-status badge-status--neutral" th:text="${utilisateur.role.name}"></span>
 							</span>
 						</li>
 					</ul>
 					<div class="form-actions">
-						<a th:href="@{/utilisateurs/edit/{id}(id=${utilisateur.id})}" class="btn btn-primary"><i class="bi bi-pencil"></i> Modifier</a>
-						<a th:href="@{/utilisateurs}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Retour</a>
+						<a th:href="@{/utilisateurs/edit/{id}(id=${utilisateur.id})}" class="btn btn-primary"><i class="bi bi-pencil"></i> <span th:text="#{common.edit}">Modifier</span></a>
+						<a th:href="@{/utilisateurs}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> <span th:text="#{common.back}">Retour</span></a>
 					</div>
 				</div>
 			</div>

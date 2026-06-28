@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/head :: head('Utilisateurs')}"></head>
-<body class="app-body" th:with="pageTitle='Utilisateurs', pageSubtitle='Administration des comptes et rôles'">
+<head th:replace="~{fragments/head :: head(#{users.pageTitle})}"></head>
+<body class="app-body" th:with="pageTitle=#{users.pageTitle},pageSubtitle=#{users.pageSubtitle}">
 <div class="app-shell">
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 	<main class="app-main">
@@ -10,7 +10,7 @@
 		<div class="page-content">
 			<div class="page-toolbar">
 				<a th:href="@{/utilisateurs/nouveau}" class="btn btn-primary">
-					<i class="bi bi-person-plus"></i> Ajouter un utilisateur
+					<i class="bi bi-person-plus"></i> <span th:text="#{users.add}">Ajouter un utilisateur</span>
 				</a>
 			</div>
 			<div class="app-card">
@@ -18,7 +18,12 @@
 					<div class="app-table-wrap">
 						<table class="app-table">
 							<thead>
-							<tr><th>Utilisateur</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr>
+							<tr>
+								<th th:text="#{common.user}">Utilisateur</th>
+								<th th:text="#{common.role}">Rôle</th>
+								<th th:text="#{common.status}">Statut</th>
+								<th th:text="#{common.actions}">Actions</th>
+							</tr>
 							</thead>
 							<tbody>
 							<tr th:each="u : ${utilisateurs}">
@@ -26,17 +31,17 @@
 								<td><span class="badge-status badge-status--neutral" th:text="${u.role.name}"></span></td>
 								<td>
 									<a th:if="${u.actif}" th:href="@{/utilisateurs/bloquer/{id}(id=${u.id})}" class="badge-status badge-status--active text-decoration-none">
-										<i class="bi bi-check-circle"></i> Actif
+										<i class="bi bi-check-circle"></i> <span th:text="#{common.status.active}">Actif</span>
 									</a>
 									<a th:if="${!u.actif}" th:href="@{/utilisateurs/debloquer/{id}(id=${u.id})}" class="badge-status badge-status--blocked text-decoration-none">
-										<i class="bi bi-lock"></i> Bloqué
+										<i class="bi bi-lock"></i> <span th:text="#{common.status.blocked}">Bloqué</span>
 									</a>
 								</td>
 								<td>
 									<div class="actions">
-										<a class="btn btn-outline-primary btn-sm btn-icon" th:href="@{/utilisateurs/view/{id}(id=${u.id})}" title="Voir"><i class="bi bi-eye"></i></a>
-										<a class="btn btn-outline-secondary btn-sm btn-icon" th:href="@{/utilisateurs/edit/{id}(id=${u.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
-										<a class="btn btn-outline-danger btn-sm btn-icon" th:href="@{/utilisateurs/delete/{id}(id=${u.id})}" title="Supprimer" onclick="return confirm('Supprimer cet utilisateur ?')"><i class="bi bi-trash"></i></a>
+										<a class="btn btn-outline-primary btn-sm btn-icon" th:href="@{/utilisateurs/view/{id}(id=${u.id})}" th:title="#{common.view}"><i class="bi bi-eye"></i></a>
+										<a class="btn btn-outline-secondary btn-sm btn-icon" th:href="@{/utilisateurs/edit/{id}(id=${u.id})}" th:title="#{common.edit}"><i class="bi bi-pencil"></i></a>
+										<a class="btn btn-outline-danger btn-sm btn-icon" th:href="@{/utilisateurs/delete/{id}(id=${u.id})}" th:title="#{common.delete}" th:onclick="|return confirm('#{users.delete.confirm}');|"><i class="bi bi-trash"></i></a>
 									</div>
 								</td>
 							</tr>

@@ -9,7 +9,11 @@
 	</div>
 
 	<div class="app-topbar__right">
-		<button type="button" class="theme-toggle" title="Changer de thème" aria-label="Changer de thème">
+		<button type="button" class="lang-toggle" th:title="#{common.lang.toggle}" th:aria-label="#{common.lang.toggle}">
+			<i class="bi bi-translate"></i>
+			<span class="lang-toggle__label">EN</span>
+		</button>
+		<button type="button" class="theme-toggle" th:title="#{common.theme.toggle}" th:aria-label="#{common.theme.toggle}">
 			<i class="bi bi-moon-fill"></i>
 		</button>
 

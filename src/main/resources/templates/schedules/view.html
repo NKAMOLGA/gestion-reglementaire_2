@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/head :: head('Détails planification')}"></head>
+<head th:replace="~{fragments/head :: head(#{schedules.view.pageTitle})}"></head>
 
-<body class="app-body" th:with="pageTitle='Détails planification', pageSubtitle=${schedule.nom}">
+<body class="app-body" th:with="pageTitle=#{schedules.view.pageTitle},pageSubtitle=${schedule.nom}">
 
 <div class="app-shell">
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
@@ -19,38 +19,47 @@
 					<ul class="detail-list">
 
 						<li class="detail-list__item">
-							<span class="detail-list__label">Identifiant</span>
+							<span class="detail-list__label" th:text="#{common.id}">Identifiant</span>
 							<span class="detail-list__value" th:text="${schedule.id}"></span>
 						</li>
 
 						<li class="detail-list__item">
-							<span class="detail-list__label">Nom</span>
+							<span class="detail-list__label" th:text="#{common.name}">Nom</span>
 							<span class="detail-list__value" th:text="${schedule.nom}"></span>
 						</li>
 
 						<li class="detail-list__item">
-							<span class="detail-list__label">Fréquence</span>
-							<span class="detail-list__value" th:text="${schedule.frequenceJours} + ' jours'"></span>
+							<span class="detail-list__label" th:text="#{schedules.view.recurrence}">Déclenchement</span>
+							<span class="detail-list__value" th:text="${@scheduleHelper.format(schedule)}"></span>
+						</li>
+
+						<li class="detail-list__item" th:if="${schedule.joursDuMois != null and !schedule.joursDuMois.isBlank()}">
+							<span class="detail-list__label" th:text="#{schedules.view.days}">Jours planifiés</span>
+							<span class="detail-list__value" th:text="${schedule.joursDuMois}"></span>
+						</li>
+
+						<li class="detail-list__item" th:if="${schedule.mois != null and !schedule.mois.isBlank()}">
+							<span class="detail-list__label" th:text="#{schedules.view.months}">Mois planifiés</span>
+							<span class="detail-list__value" th:text="${schedule.mois}"></span>
 						</li>
 
 						<li class="detail-list__item">
-							<span class="detail-list__label">Date début</span>
+							<span class="detail-list__label" th:text="#{common.dateStart}">Date début</span>
 							<span class="detail-list__value" th:text="${schedule.dateDebut}"></span>
 						</li>
 
 						<li class="detail-list__item">
-							<span class="detail-list__label">Date fin</span>
+							<span class="detail-list__label" th:text="#{common.dateEnd}">Date fin</span>
 							<span class="detail-list__value" th:text="${schedule.dateFin}"></span>
 						</li>
 
 						<li class="detail-list__item">
-							<span class="detail-list__label">Heure</span>
+							<span class="detail-list__label" th:text="#{common.time}">Heure</span>
 							<span class="detail-list__value" th:text="${schedule.heureExecution}"></span>
 						</li>
 
-						<!--  NOUVEAU : Dernier lancement -->
 						<li class="detail-list__item">
-							<span class="detail-list__label">Dernier lancement</span>
+							<span class="detail-list__label" th:text="#{schedules.view.lastRun}">Dernier lancement</span>
 							<span class="detail-list__value"
 								  th:text="${schedule.derniereExecution != null 
 											? #temporals.format(schedule.derniereExecution, 'dd/MM/yyyy HH:mm') 
@@ -58,9 +67,8 @@
 							</span>
 						</li>
 
-						<!--  NOUVEAU : Prochain lancement -->
 						<li class="detail-list__item">
-							<span class="detail-list__label">Prochain lancement</span>
+							<span class="detail-list__label" th:text="#{schedules.view.nextRun}">Prochain lancement</span>
 							<span class="detail-list__value"
 								  th:text="${schedule.nextRunDate != null 
 											? #temporals.format(schedule.nextRunDate, 'dd/MM/yyyy HH:mm') 
@@ -69,13 +77,13 @@
 						</li>
 
 						<li class="detail-list__item">
-							<span class="detail-list__label">Statut</span>
+							<span class="detail-list__label" th:text="#{common.status}">Statut</span>
 							<span class="detail-list__value">
 								<span th:if="${schedule.active}" class="badge-status badge-status--active">
-									<i class="bi bi-check-circle"></i> Actif
+									<i class="bi bi-check-circle"></i> <span th:text="#{common.status.active}">Actif</span>
 								</span>
 								<span th:if="${!schedule.active}" class="badge-status badge-status--blocked">
-									<i class="bi bi-pause-circle"></i> Inactif
+									<i class="bi bi-pause-circle"></i> <span th:text="#{common.status.inactive}">Inactif</span>
 								</span>
 							</span>
 						</li>
@@ -86,17 +94,17 @@
 
 						<a th:href="@{'/comparaison/planificateur/' + ${schedule.id}}"
 						   class="btn btn-outline-primary">
-							<i class="bi bi-arrow-left-right"></i> Analyse comparative
+							<i class="bi bi-arrow-left-right"></i> <span th:text="#{nav.comparison}">Analyse comparative</span>
 						</a>
 
 						<a th:href="@{'/schedules/edit/' + ${schedule.id}}"
 						   class="btn btn-primary">
-							<i class="bi bi-pencil"></i> Modifier
+							<i class="bi bi-pencil"></i> <span th:text="#{common.edit}">Modifier</span>
 						</a>
 
 						<a th:href="@{/schedules}"
 						   class="btn btn-outline-secondary">
-							<i class="bi bi-arrow-left"></i> Retour
+							<i class="bi bi-arrow-left"></i> <span th:text="#{common.back}">Retour</span>
 						</a>
 
 					</div>

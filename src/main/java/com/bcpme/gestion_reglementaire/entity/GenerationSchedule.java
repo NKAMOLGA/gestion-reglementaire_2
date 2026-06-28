@@ -22,6 +22,18 @@ public class GenerationSchedule {
     @Column(name = "frequence_jours")
     private Integer frequenceJours;
 
+    /** MONTHLY (Windows-like) ou DAILY (legacy) */
+    @Column(name = "type_recurrence")
+    private String typeRecurrence;
+
+    /** Jours du mois sélectionnés, ex. "5,10,20,30" */
+    @Column(name = "jours_du_mois")
+    private String joursDuMois;
+
+    /** Mois sélectionnés 1-12, vide = tous les mois */
+    @Column(name = "mois")
+    private String mois;
+
     @Column(name = "date_debut")
     private LocalDateTime dateDebut;
 

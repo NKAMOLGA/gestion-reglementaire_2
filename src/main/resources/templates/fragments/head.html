@@ -1,7 +1,8 @@
 <head th:fragment="head(title)" xmlns:th="http://www.thymeleaf.org">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title th:text="${title} + ' — Gestion Réglementaire'">Gestion Réglementaire</title>
+	<title th:text="|${title} #{app.title.suffix}|">Réserve Obligatoire</title>
+	<script th:src="@{/js/locale.js}"></script>
 	<script>
 		(function () {
 			var t = localStorage.getItem('bcpme-theme') || 'light';

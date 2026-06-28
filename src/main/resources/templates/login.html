@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head('Connexion')}"></head>
+<head th:replace="~{fragments/head :: head(#{login.pageTitle})}"></head>
 <body class="login-body">
-	<button type="button" class="theme-toggle login-theme-toggle" title="Changer de thème" aria-label="Changer de thème">
-		<i class="bi bi-moon-fill"></i>
-	</button>
+	<div class="login-toolbar">
+		<button type="button" class="lang-toggle login-lang-toggle" th:title="#{common.lang.toggle}" th:aria-label="#{common.lang.toggle}">
+			<i class="bi bi-translate"></i>
+			<span class="lang-toggle__label">EN</span>
+		</button>
+		<button type="button" class="theme-toggle login-theme-toggle" th:title="#{common.theme.toggle}" th:aria-label="#{common.theme.toggle}">
+			<i class="bi bi-moon-fill"></i>
+		</button>
+	</div>
 
 	<div class="login-page">
 		<div class="login-card">
 			<div class="login-card__header">
 				<img class="login-card__logo"
 					 th:src="@{/images/bc-pme-logo.png}"
-					 alt="BC-PME — Banque Camerounaise des Petites et Moyennes Entreprises">
-				<h1 class="login-card__title">Gestion Réglementaire</h1>
-				<p class="login-card__subtitle">Connectez-vous à votre espace</p>
+					 alt="BC-PME">
+				<h1 class="login-card__title" th:text="#{app.title}">Réserve Obligatoire</h1>
+				<p class="login-card__subtitle" th:text="#{login.subtitle}">Connectez-vous à votre espace</p>
 			</div>
 
 			<div class="login-card__body">
@@ -23,32 +29,32 @@
 				</div>
 				<div class="login-alert login-alert--success" th:if="${param.logout}">
 					<i class="bi bi-check-circle"></i>
-					<span>Déconnexion réussie.</span>
+					<span th:text="#{login.logout.success}">Déconnexion réussie.</span>
 				</div>
 
 				<form class="login-form" th:action="@{/login}" method="post">
 					<div class="login-form__group">
 						<label class="login-form__label" for="username">
-							<i class="bi bi-person"></i> Nom d'utilisateur
+							<i class="bi bi-person"></i> <span th:text="#{login.username.label}">Nom d'utilisateur</span>
 						</label>
 						<input class="login-form__input" type="text" id="username" name="username"
-							   placeholder="Votre identifiant" required autofocus>
+							   th:placeholder="#{login.username.placeholder}" required autofocus>
 					</div>
 					<div class="login-form__group">
 						<label class="login-form__label" for="password">
-							<i class="bi bi-lock"></i> Mot de passe
+							<i class="bi bi-lock"></i> <span th:text="#{login.password.label}">Mot de passe</span>
 						</label>
 						<input class="login-form__input" type="password" id="password" name="password"
-							   placeholder="Votre mot de passe" required>
+							   th:placeholder="#{login.password.placeholder}" required>
 					</div>
 					<button class="login-form__submit" type="submit">
-						<i class="bi bi-box-arrow-in-right"></i> Se connecter
+						<i class="bi bi-box-arrow-in-right"></i> <span th:text="#{login.submit}">Se connecter</span>
 					</button>
 				</form>
 			</div>
 
 			<div class="login-card__footer">
-				<p>BC-PME SA — Banque Camerounaise des Petites et Moyennes Entreprises</p>
+				<p th:text="#{org.fullName}">BC-PME SA</p>
 			</div>
 		</div>
 	</div>

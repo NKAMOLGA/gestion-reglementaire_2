@@ -19,7 +19,9 @@
 	function initDate() {
 		var el = document.getElementById('topbar-date');
 		if (el) {
-			el.textContent = new Date().toLocaleDateString('fr-FR', {
+			var lang = localStorage.getItem('bcpme-lang') || 'fr';
+			var locale = lang === 'en' ? 'en-GB' : 'fr-FR';
+			el.textContent = new Date().toLocaleDateString(locale, {
 				weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
 			});
 		}

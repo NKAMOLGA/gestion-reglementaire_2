@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/head :: head('Planification COL')}"></head>
+<head th:replace="~{fragments/head :: head(#{schedules.headTitle})}"></head>
 
-<body class="app-body" th:with="pageTitle='Planifications COL', pageSubtitle='Exécutions automatiques'">
+<body class="app-body" th:with="pageTitle=#{schedules.list.pageTitle},pageSubtitle=#{schedules.list.pageSubtitle}">
 
 <div class="app-shell">
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
@@ -15,7 +15,7 @@
 
 			<div class="page-toolbar">
 				<a th:href="@{/schedules/new}" class="btn btn-primary">
-					<i class="bi bi-plus-lg"></i> Nouvelle planification
+					<i class="bi bi-plus-lg"></i> <span th:text="#{schedules.create}">Nouvelle planification</span>
 				</a>
 			</div>
 
@@ -27,13 +27,12 @@
 
 							<thead>
 							<tr>
-								<th>Nom</th>
-								<th>Fréquence</th>
-								<th>Début</th>
-								<th>Heure</th>
-
-								<th>Statut</th>
-								<th>Actions</th>
+								<th th:text="#{common.name}">Nom</th>
+								<th th:text="#{schedules.view.recurrence}">Déclenchement</th>
+								<th th:text="#{common.start}">Début</th>
+								<th th:text="#{common.time}">Heure</th>
+								<th th:text="#{common.status}">Statut</th>
+								<th th:text="#{common.actions}">Actions</th>
 							</tr>
 							</thead>
 
@@ -42,19 +41,18 @@
 
 								<td th:text="${s.nom}"></td>
 
-								<td th:text="${s.frequenceJours} + ' jours'"></td>
+								<td th:text="${@scheduleHelper.format(s)}"></td>
 
 								<td th:text="${s.dateDebut}"></td>
 
 								<td th:text="${s.heureExecution}"></td>
 
-
 								<td>
 									<span th:if="${s.active}" class="badge-status badge-status--active">
-										<i class="bi bi-check-circle"></i> Actif
+										<i class="bi bi-check-circle"></i> <span th:text="#{common.status.active}">Actif</span>
 									</span>
 									<span th:if="${!s.active}" class="badge-status badge-status--blocked">
-										<i class="bi bi-pause-circle"></i> Inactif
+										<i class="bi bi-pause-circle"></i> <span th:text="#{common.status.inactive}">Inactif</span>
 									</span>
 								</td>
 
@@ -63,27 +61,27 @@
 
 										<a th:href="@{'/schedules/view/' + ${s.id}}"
 										   class="btn btn-outline-primary btn-sm btn-icon"
-										   title="Voir">
+										   th:title="#{common.view}">
 											<i class="bi bi-eye"></i>
 										</a>
 
 										<a th:href="@{'/schedules/edit/' + ${s.id}}"
 										   class="btn btn-outline-secondary btn-sm btn-icon"
-										   title="Modifier">
+										   th:title="#{common.edit}">
 											<i class="bi bi-pencil"></i>
 										</a>
 
 										<a th:href="@{'/schedules/toggle/' + ${s.id}}"
 										   class="btn btn-outline-warning btn-sm btn-icon"
-										   title="Activer/Désactiver">
+										   th:title="#{schedules.toggle}">
 											<i class="bi bi-arrow-repeat"></i>
 										</a>
 
 										<button type="button"
 												class="btn btn-outline-danger btn-sm btn-icon"
-												title="Supprimer"
+												th:title="#{common.delete}"
 												th:attr="data-delete-url=@{/schedules/delete/{id}(id=${s.id})},
-														data-delete-message=|Supprimer la planification « ${s.nom} » ?|">
+														data-delete-message=#{schedules.delete.confirm(${s.nom})}">
 											<i class="bi bi-trash"></i>
 										</button>
 

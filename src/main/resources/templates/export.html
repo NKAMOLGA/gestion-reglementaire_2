@@ -2,9 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta http-equiv="refresh" content="0;url=/generation-col">
-	<title>Redirection…</title>
+	<title th:text="#{export.redirect.title}">Redirection…</title>
 </head>
 <body>
-	<p>Redirection vers la génération COL… <a th:href="@{/generation-col}">Cliquez ici</a>.</p>
+	<p>
+		<span th:text="#{export.redirect.message}">Redirection vers la génération COL…</span>
+		<a th:href="@{/generation-col}" th:text="#{common.clickHere}">Cliquez ici</a>.
+	</p>
 </body>
 </html>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/head :: head('Génération COL')}"></head>
-<body class="app-body" th:with="pageTitle='Génération COL', pageSubtitle='Production du fichier réglementaire'">
+<head th:replace="~{fragments/head :: head(#{col.generation.pageTitle})}"></head>
+<body class="app-body" th:with="pageTitle=#{col.generation.pageTitle},pageSubtitle=#{col.generation.pageSubtitle}">
 <div class="app-shell">
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 	<main class="app-main">
@@ -10,15 +10,15 @@
 		<div class="page-content">
 			<div class="app-card" style="max-width: 560px;">
 				<div class="app-card__header">
-					<h2 class="app-card__header-title"><i class="bi bi-gear"></i> Lancer la génération</h2>
+					<h2 class="app-card__header-title"><i class="bi bi-gear"></i> <span th:text="#{col.generation.cardTitle}">Lancer la génération</span></h2>
 				</div>
 				<div class="app-card__body">
-					<p class="text-muted mb-4" style="font-size: 0.875rem;">
+					<p class="text-muted mb-4" style="font-size: 0.875rem;" th:text="#{col.generation.description}">
 						Déclenchez la génération du fichier COL. L'opération sera enregistrée dans l'historique.
 					</p>
 					<form method="post" th:action="@{/generation-col/lancer}">
 						<button type="submit" class="btn btn-primary btn-lg">
-							<i class="bi bi-play-circle"></i> Générer le fichier COL
+							<i class="bi bi-play-circle"></i> <span th:text="#{col.generation.submit}">Générer le fichier COL</span>
 						</button>
 					</form>
 				</div>
